@@ -87,7 +87,7 @@ export function ProductGrid() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4"
+              className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4"
             >
               {data.products.map((product, i) => (
                 <ProductCard key={product.id} product={product} index={i} />
@@ -125,7 +125,7 @@ function ProductGridSkeleton({ view }: { view: ViewMode }) {
     );
   }
   return (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
       {items.map((_, i) => (
         <Skeleton key={i} className="aspect-[3/4.2] w-full rounded-xl" />
       ))}

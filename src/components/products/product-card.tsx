@@ -70,8 +70,8 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
           alt={product.name}
           fill
           loading="lazy"
-          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-          className="object-contain p-6 transition-transform duration-500 ease-out group-hover:scale-105"
+          sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
+          className="object-contain p-3 transition-transform duration-500 ease-out group-hover:scale-105 sm:p-6"
         />
         {gallery.length > 1 && (
           <>
@@ -124,30 +124,36 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
         )}
       </Link>
 
-      <div className="flex flex-1 flex-col gap-2 p-5">
+      <div className="flex flex-1 flex-col gap-1.5 p-3 sm:gap-2 sm:p-5">
         <Link href={href}>
-          <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-foreground hover:text-primary">
+          <h3 className="line-clamp-2 text-xs font-semibold leading-snug text-foreground hover:text-primary sm:text-sm">
             {product.name}
           </h3>
         </Link>
-        <p className="line-clamp-2 text-xs text-muted-foreground">
+        {/* Description dropped below `sm` — at two cards per row there
+            isn't room for it, and shoppers scan name + price first
+            (Mercado Libre-style compact card); full details are one tap
+            away on the product page. */}
+        <p className="hidden text-xs text-muted-foreground sm:line-clamp-2 sm:block">
           {truncate(product.description, 90)}
         </p>
 
-        <div className="mt-auto flex flex-col gap-3 pt-3">
-          <div className="flex flex-wrap items-baseline gap-2">
+        <div className="mt-auto flex flex-col gap-2 pt-2 sm:gap-3 sm:pt-3">
+          <div className="flex flex-wrap items-baseline gap-1.5 sm:gap-2">
             {product.isOnSale && product.originalPrice && (
-              <span className="text-sm text-muted-foreground line-through">
+              <span className="text-xs text-muted-foreground line-through sm:text-sm">
                 {formatCurrency(product.originalPrice)}
               </span>
             )}
-            <span className="text-lg font-bold text-foreground">{formatCurrency(product.price)}</span>
+            <span className="text-base font-bold text-foreground sm:text-lg">
+              {formatCurrency(product.price)}
+            </span>
           </div>
 
           <InquireButton
             productId={product.id}
             productName={product.name}
-            className="w-full"
+            className="w-full px-2 text-xs sm:px-4 sm:text-sm"
           />
         </div>
       </div>

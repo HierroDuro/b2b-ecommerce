@@ -58,7 +58,7 @@ export function CuratedProductFeed() {
         {Array.from({ length: INITIAL_SECTIONS }).map((_, i) => (
           <div key={i} className="space-y-4">
             <Skeleton className="h-6 w-40" />
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
               {Array.from({ length: 8 }).map((_, j) => (
                 <Skeleton key={j} className="aspect-[3/4.2] w-full rounded-xl" />
               ))}
@@ -90,7 +90,7 @@ export function CuratedProductFeed() {
               )}
               {section.categoryName}
             </h2>
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
               {section.products.map((product, i) => (
                 <ProductCard key={product.id} product={product} index={i} />
               ))}
