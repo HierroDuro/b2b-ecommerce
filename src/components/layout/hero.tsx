@@ -49,11 +49,6 @@ export function Hero({ productCount, categoryCount, showcaseProducts }: HeroProp
           <span className="text-gradient-aurora">en un solo proveedor</span>.
         </h1>
 
-        <p className="mt-3 max-w-lg text-sm leading-relaxed text-muted-foreground sm:mt-5 sm:text-base">
-          Tecnología, papelería y artículos gráficos para tu empresa, con stock actualizado
-          todos los días.
-        </p>
-
         <div className="mt-5 flex flex-wrap items-center gap-3 sm:mt-8">
           <Link
             href="#catalogo"
