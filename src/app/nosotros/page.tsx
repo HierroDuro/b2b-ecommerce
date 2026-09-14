@@ -15,8 +15,8 @@ export const metadata: Metadata = {
 const values: { icon: LucideIcon; title: string; desc: string }[] = [
   {
     icon: ShieldCheck,
-    title: "Precios preferenciales",
-    desc: "Condiciones diferenciales por volumen, pensadas para el consumo real de tu empresa.",
+    title: "Precios competitivos",
+    desc: "Buenos precios en todo el catálogo, sin condiciones ni letra chica.",
   },
   {
     icon: RefreshCw,

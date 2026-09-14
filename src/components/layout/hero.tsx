@@ -17,7 +17,7 @@ interface HeroProps {
 
 const valueProps: { icon: LucideIcon; label: string }[] = [
   { icon: Boxes, label: "Catálogo amplio" },
-  { icon: Tag, label: "Precios mayoristas" },
+  { icon: Tag, label: "Precios competitivos" },
   { icon: Truck, label: "Envíos a todo el país" },
   { icon: MessageCircle, label: "Atención directa" },
 ];
@@ -50,8 +50,8 @@ export function Hero({ productCount, categoryCount, showcaseProducts }: HeroProp
         </h1>
 
         <p className="mt-3 max-w-lg text-sm leading-relaxed text-muted-foreground sm:mt-5 sm:text-base">
-          Vendemos productos de tecnología, papelería y artículos gráficos para el día a día
-          de tu empresa, con catálogo actualizado y precios preferenciales por volumen.
+          Tecnología, papelería y artículos gráficos para tu empresa, con stock actualizado
+          todos los días.
         </p>
 
         <div className="mt-5 flex flex-wrap items-center gap-3 sm:mt-8">

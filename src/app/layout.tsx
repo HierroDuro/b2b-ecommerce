@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
-  keywords: ["ecommerce b2b", "tecnología", "resmas", "gráfica", "mayorista", "catálogo empresas"],
+  keywords: ["ecommerce b2b", "tecnología", "resmas", "gráfica", "catálogo empresas"],
   authors: [{ name: siteConfig.name }],
   robots: { index: true, follow: true },
   openGraph: {

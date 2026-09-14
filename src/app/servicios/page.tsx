@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ShoppingBag, Truck, Headset, MessageCircle, type LucideIcon } from "lucide-react";
+import { RefreshCw, Truck, Headset, MessageCircle, type LucideIcon } from "lucide-react";
 
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
@@ -8,14 +8,14 @@ import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
   title: "Servicios",
-  description: "Servicios de venta mayorista, logística y soporte para empresas.",
+  description: "Catálogo actualizado, logística y soporte técnico para empresas.",
 };
 
 const services: { icon: LucideIcon; title: string; desc: string }[] = [
   {
-    icon: ShoppingBag,
-    title: "Venta mayorista",
-    desc: "Precios diferenciales por volumen de compra, pensados para el consumo real de tu empresa.",
+    icon: RefreshCw,
+    title: "Catálogo actualizado",
+    desc: "Stock y precios al día, para que compres siempre con la información correcta.",
   },
   {
     icon: Truck,
@@ -45,8 +45,8 @@ export default function ServiciosPage() {
             Servicios pensados para <span className="text-gradient-aurora">tu empresa</span>
           </h1>
           <p className="mt-4 text-muted-foreground">
-            Ofrecemos venta mayorista con precios preferenciales, logística propia y soporte
-            técnico dedicado para empresas de todos los tamaños.
+            Catálogo actualizado, logística propia y soporte técnico dedicado para empresas
+            de todos los tamaños.
           </p>
         </div>
 
