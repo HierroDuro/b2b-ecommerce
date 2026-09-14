@@ -34,7 +34,7 @@ export function Hero({ productCount, categoryCount, showcaseProducts }: HeroProp
   const showcase = showcaseProducts.slice(0, 3);
 
   return (
-    <section className="grid gap-10 py-8 lg:grid-cols-2 lg:items-center lg:gap-16 lg:py-16">
+    <section className="grid gap-10 py-8 lg:grid-cols-2 lg:items-start lg:gap-16 lg:py-14">
       <motion.div
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
@@ -86,7 +86,7 @@ export function Hero({ productCount, categoryCount, showcaseProducts }: HeroProp
         transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
         className="relative mx-auto w-full max-w-md"
       >
-        <div className="relative aspect-[4/5] w-full overflow-hidden rounded-3xl bg-secondary/70">
+        <div className="relative aspect-[4/4.4] w-full overflow-hidden rounded-3xl bg-secondary/70">
           {/* Faint dot-grid texture — the only decorative touch, confined to
               this one panel instead of washing over the whole page. */}
           <div
