@@ -34,7 +34,7 @@ export function Hero({ productCount, categoryCount, showcaseProducts }: HeroProp
   const showcase = showcaseProducts.slice(0, 3);
 
   return (
-    <section className="grid gap-10 py-8 lg:grid-cols-2 lg:items-start lg:gap-16 lg:py-14">
+    <section className="grid gap-6 py-5 sm:py-8 lg:grid-cols-2 lg:items-start lg:gap-16 lg:py-14">
       <motion.div
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
@@ -44,17 +44,17 @@ export function Hero({ productCount, categoryCount, showcaseProducts }: HeroProp
           Proveedor B2B · Stock actualizado
         </span>
 
-        <h1 className="mt-5 text-4xl font-bold leading-[1.12] tracking-tight text-foreground sm:text-5xl">
+        <h1 className="mt-4 text-3xl font-bold leading-[1.15] tracking-tight text-foreground sm:mt-5 sm:text-4xl sm:leading-[1.12] lg:text-5xl">
           Todo lo que tu empresa necesita,{" "}
           <span className="text-gradient-aurora">en un solo proveedor</span>.
         </h1>
 
-        <p className="mt-5 max-w-lg text-base leading-relaxed text-muted-foreground">
+        <p className="mt-3 max-w-lg text-sm leading-relaxed text-muted-foreground sm:mt-5 sm:text-base">
           Vendemos productos de tecnología, papelería y artículos gráficos para el día a día
           de tu empresa, con catálogo actualizado y precios preferenciales por volumen.
         </p>
 
-        <div className="mt-8 flex flex-wrap items-center gap-3">
+        <div className="mt-5 flex flex-wrap items-center gap-3 sm:mt-8">
           <Link
             href="#catalogo"
             className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-soft transition-transform hover:scale-[1.03]"
@@ -70,7 +70,7 @@ export function Hero({ productCount, categoryCount, showcaseProducts }: HeroProp
           </Link>
         </div>
 
-        <dl className="mt-10 grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-4">
+        <dl className="mt-6 grid grid-cols-2 gap-x-4 gap-y-3 sm:mt-10 sm:gap-y-4 sm:grid-cols-4">
           {valueProps.map(({ icon: Icon, label }) => (
             <div key={label} className="flex items-center gap-2">
               <Icon className="h-4 w-4 shrink-0 text-primary" />
@@ -80,11 +80,15 @@ export function Hero({ productCount, categoryCount, showcaseProducts }: HeroProp
         </dl>
       </motion.div>
 
+      {/* The product showcase panel is a nice-to-have visual proof, not
+          essential info — on a phone it just pushes the actual catalog
+          further down, so it only shows from `sm` up. Desktop/tablet keep
+          it as the two-column layout's right-hand visual. */}
       <motion.div
         initial={{ opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
-        className="relative mx-auto w-full max-w-md"
+        className="relative mx-auto hidden w-full max-w-md sm:block"
       >
         <div className="relative aspect-[4/4.4] w-full overflow-hidden rounded-3xl bg-secondary/70">
           {/* Faint dot-grid texture — the only decorative touch, confined to
