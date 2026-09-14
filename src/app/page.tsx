@@ -89,11 +89,7 @@ export default async function HomePage() {
         className="mx-auto max-w-[1920px] px-6 pb-20 lg:px-10"
         style={{ paddingTop: siteConfig.headerHeight + 32 }}
       >
-        <Hero
-          productCount={productCount}
-          categoryCount={categories.length}
-          showcaseProducts={showcaseProducts}
-        />
+        <Hero productCount={productCount} showcaseProducts={showcaseProducts} />
 
         <div id="catalogo" className="scroll-mt-24">
           <OffersMarquee offers={onSaleProducts} />

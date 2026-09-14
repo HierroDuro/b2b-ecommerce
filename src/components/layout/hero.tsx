@@ -11,7 +11,6 @@ import type { ProductDTO } from "@/types/product";
 
 interface HeroProps {
   productCount: number;
-  categoryCount: number;
   showcaseProducts: ProductDTO[];
 }
 
@@ -30,7 +29,7 @@ const valueProps: { icon: LucideIcon; label: string }[] = [
  * the pitch. Kept deliberately calm (no decorative blobs, one restrained
  * brand gradient) per the corporate-B2B direction.
  */
-export function Hero({ productCount, categoryCount, showcaseProducts }: HeroProps) {
+export function Hero({ productCount, showcaseProducts }: HeroProps) {
   const showcase = showcaseProducts.slice(0, 3);
 
   return (
@@ -118,9 +117,6 @@ export function Hero({ productCount, categoryCount, showcaseProducts }: HeroProp
 
           <div className="absolute right-4 top-4 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-soft">
             +{productCount} productos
-          </div>
-          <div className="absolute bottom-4 left-4 rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold text-foreground shadow-soft">
-            {categoryCount} categorías
           </div>
         </div>
       </motion.div>
