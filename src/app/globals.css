@@ -19,8 +19,9 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 20% 12%;
 
-    /* Cool blue used for primary actions and the search focus ring. */
-    --primary: 217 91% 45%;
+    /* Deep indigo — brand color, echoes the Fitograf reference logo.
+       Used for primary actions, important headings and the search focus ring. */
+    --primary: 241 65% 27%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 220 14% 96%;
@@ -41,18 +42,16 @@
 
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 217 91% 60%;
+    --ring: 228 85% 58%;
 
     --radius: 0.65rem;
 
-    /* Aurora accent set — decorative background blobs + gradient touches
-       on the storefront (CTA, section headings, card hover glow). Kept
-       separate from --primary so the rest of the UI (buttons, links,
-       focus rings) is unaffected. */
-    --aurora-1: 217 91% 60%; /* blue, echoes --primary */
-    --aurora-2: 271 81% 66%; /* violet */
-    --aurora-3: 330 81% 62%; /* magenta */
-    --aurora-4: 189 85% 50%; /* cyan */
+    /* Two-stop brand blue used sparingly for gradient touches (primary CTA,
+       section heading accents, card hover glow) — deep indigo into a
+       brighter interactive blue. Kept separate from --primary so the rest
+       of the UI (buttons, links, focus rings) is unaffected. */
+    --aurora-1: 241 65% 27%; /* deep indigo, echoes --primary */
+    --aurora-2: 228 85% 58%; /* brighter interactive blue */
   }
 
   .dark {
@@ -65,7 +64,7 @@
     --popover: 222 22% 11%;
     --popover-foreground: 210 20% 94%;
 
-    --primary: 217 91% 60%;
+    --primary: 228 85% 62%;
     --primary-foreground: 222 24% 8%;
 
     --secondary: 222 18% 16%;
@@ -85,12 +84,10 @@
 
     --border: 222 16% 20%;
     --input: 222 16% 20%;
-    --ring: 217 91% 60%;
+    --ring: 228 85% 65%;
 
-    --aurora-1: 217 91% 65%;
-    --aurora-2: 271 91% 72%;
-    --aurora-3: 330 85% 68%;
-    --aurora-4: 189 90% 58%;
+    --aurora-1: 241 55% 58%;
+    --aurora-2: 210 85% 62%;
   }
 }
 
@@ -123,36 +120,6 @@
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-  }
-}
-
-/* Slow, organic drift for the decorative aurora blobs — three different
-   paths/durations so the motion doesn't read as a single pulsing blob. */
-@keyframes aurora-float-a {
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(4%, 6%) scale(1.08);
-  }
-}
-@keyframes aurora-float-b {
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(-6%, 4%) scale(1.1);
-  }
-}
-@keyframes aurora-float-c {
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(3%, -6%) scale(1.05);
   }
 }
 

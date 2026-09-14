@@ -44,7 +44,7 @@ export function Header() {
 
         {/* Center zone: logo */}
         <Link href="/" className="flex items-center gap-2 justify-self-center">
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-primary to-[hsl(var(--aurora-2))] text-primary-foreground">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground">
             <Boxes className="h-4 w-4" />
           </span>
           <span className="text-lg font-semibold tracking-tight text-foreground">

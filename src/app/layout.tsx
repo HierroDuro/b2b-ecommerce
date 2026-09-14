@@ -6,7 +6,6 @@ import { QueryProvider } from "@/components/providers/query-provider";
 import { SessionProvider } from "@/components/providers/session-provider";
 import { ProductFiltersProvider } from "@/components/products/product-filters-context";
 import { Toaster } from "@/components/ui/sonner";
-import { AuroraBackground } from "@/components/layout/aurora-background";
 import { siteConfig } from "@/config/site";
 
 import "./globals.css";
@@ -46,7 +45,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased theme-transition`}>
-        <AuroraBackground />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange={false}>
           <SessionProvider>
             <QueryProvider>

@@ -1,6 +1,6 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { Hero } from "@/components/layout/hero";
+import { Hero, OffersMarquee } from "@/components/layout/hero";
 import { Storefront } from "@/components/products/storefront";
 import { SearchBar } from "@/components/products/search-bar";
 import { prisma } from "@/lib/prisma";
@@ -50,8 +50,36 @@ async function getOnSaleProducts(): Promise<ProductDTO[]> {
   }));
 }
 
+/** Feeds the hero's right-side product showcase — real catalog products
+ * (not a stock photo) as proof there's an actual, priced range behind the
+ * pitch. Featured products first, topped up with the newest active ones
+ * so the panel still has content even before any admin marks a "Destacado". */
+async function getShowcaseProducts(): Promise<ProductDTO[]> {
+  const products = await prisma.product.findMany({
+    where: { isActive: true },
+    orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }],
+    take: 3,
+    include: {
+      category: { select: { id: true, name: true, slug: true } },
+      images: { orderBy: { order: "asc" } },
+    },
+  });
+  return products.map((p) => ({
+    ...p,
+    price: Number(p.price),
+    originalPrice: p.originalPrice ? Number(p.originalPrice) : null,
+    images: p.images.map((i) => i.url),
+    createdAt: p.createdAt.toISOString(),
+    updatedAt: p.updatedAt.toISOString(),
+  }));
+}
+
 export default async function HomePage() {
-  const [categories, onSaleProducts] = await Promise.all([getCategories(), getOnSaleProducts()]);
+  const [categories, onSaleProducts, showcaseProducts] = await Promise.all([
+    getCategories(),
+    getOnSaleProducts(),
+    getShowcaseProducts(),
+  ]);
   const productCount = categories.reduce((sum, c) => sum + (c.productCount ?? 0), 0);
 
   return (
@@ -61,15 +89,23 @@ export default async function HomePage() {
         className="mx-auto max-w-[1920px] px-6 pb-20 lg:px-10"
         style={{ paddingTop: siteConfig.headerHeight + 32 }}
       >
-        <Hero productCount={productCount} categoryCount={categories.length} offers={onSaleProducts} />
+        <Hero
+          productCount={productCount}
+          categoryCount={categories.length}
+          showcaseProducts={showcaseProducts}
+        />
 
-        {/* The header's search bar is hidden below `md`; this gives mobile
-            users the same real-time search without cramming it into the
-            fixed 75px header. */}
-        <div className="mb-5 md:hidden">
-          <SearchBar />
+        <div id="catalogo" className="scroll-mt-24">
+          <OffersMarquee offers={onSaleProducts} />
+
+          {/* The header's search bar is hidden below `md`; this gives mobile
+              users the same real-time search without cramming it into the
+              fixed 75px header. */}
+          <div className="mb-5 md:hidden">
+            <SearchBar />
+          </div>
+          <Storefront categories={categories} />
         </div>
-        <Storefront categories={categories} />
       </main>
       <Footer />
     </div>
