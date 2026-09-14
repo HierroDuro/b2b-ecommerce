@@ -34,7 +34,7 @@ export function Hero({ productCount, categoryCount, showcaseProducts }: HeroProp
   const showcase = showcaseProducts.slice(0, 3);
 
   return (
-    <section className="grid gap-6 py-5 sm:py-8 lg:grid-cols-2 lg:items-start lg:gap-16 lg:py-14">
+    <section className="grid gap-6 py-5 sm:py-8 lg:grid-cols-2 lg:items-center lg:gap-16 lg:py-14">
       <motion.div
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
