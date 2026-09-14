@@ -78,7 +78,6 @@ export function Hero({ productCount, showcaseProducts }: HeroProps) {
             of a floating collage — that layout only works with the extra
             width of the two-column desktop grid. */}
         <div className="mt-6 lg:hidden">
-          <h2 className="mb-2 text-xs font-semibold text-foreground">Los más accesibles</h2>
           <div className="grid grid-cols-3 gap-2 sm:gap-3">
             {showcase.map((product) => (
               <Link
