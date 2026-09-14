@@ -52,12 +52,13 @@ async function getOnSaleProducts(): Promise<ProductDTO[]> {
 
 /** Feeds the hero's right-side product showcase — real catalog products
  * (not a stock photo) as proof there's an actual, priced range behind the
- * pitch. Featured products first, topped up with the newest active ones
- * so the panel still has content even before any admin marks a "Destacado". */
+ * pitch. Always the 3 cheapest active products, so it updates itself the
+ * moment a lower-priced product is added or a price drops — no manual
+ * curation needed. */
 async function getShowcaseProducts(): Promise<ProductDTO[]> {
   const products = await prisma.product.findMany({
     where: { isActive: true },
-    orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }],
+    orderBy: { price: "asc" },
     take: 3,
     include: {
       category: { select: { id: true, name: true, slug: true } },

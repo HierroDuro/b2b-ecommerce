@@ -126,15 +126,16 @@ export function Hero({ productCount, showcaseProducts }: HeroProps) {
 
 function ShowcaseCard({ product, className }: { product: ProductDTO; className: string }) {
   return (
-    <div
-      className={`overflow-hidden rounded-xl border border-border bg-card p-3 shadow-card transition-transform hover:rotate-0 hover:scale-105 ${className}`}
+    <Link
+      href={`/productos/${product.id}`}
+      className={`block overflow-hidden rounded-xl border border-border bg-card p-3 shadow-card transition-transform hover:z-10 hover:rotate-0 hover:scale-105 ${className}`}
     >
       <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-white">
         <Image src={product.imageUrl} alt={product.name} fill sizes="200px" className="object-contain p-3" />
       </div>
       <p className="mt-2 line-clamp-1 text-xs font-semibold text-foreground">{product.name}</p>
       <p className="text-sm font-bold text-primary">{formatCurrency(product.price)}</p>
-    </div>
+    </Link>
   );
 }
 
