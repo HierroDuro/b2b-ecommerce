@@ -190,7 +190,7 @@ export function OffersMarquee({ offers }: { offers: ProductDTO[] }) {
       </h2>
       <div className="group w-full max-w-none overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)]">
         <div
-          className="flex w-max items-stretch gap-5 [animation-play-state:running] group-hover:[animation-play-state:paused]"
+          className="flex w-max items-stretch gap-3 [animation-play-state:running] group-hover:[animation-play-state:paused] lg:gap-5"
           style={{
             // Longhand properties on purpose: the `animation` shorthand
             // implicitly resets animation-play-state to "running" and, set
@@ -207,13 +207,13 @@ export function OffersMarquee({ offers }: { offers: ProductDTO[] }) {
             <Link
               key={`${product.id}-${i}`}
               href={`/productos/${product.id}`}
-              className="relative flex w-56 shrink-0 flex-col overflow-hidden rounded-xl border border-border bg-card text-left shadow-soft transition-shadow hover:border-primary/30 hover:shadow-card-hover sm:w-64"
+              className="relative flex w-28 shrink-0 flex-col overflow-hidden rounded-xl border border-border bg-card text-left shadow-soft transition-shadow hover:border-primary/30 hover:shadow-card-hover sm:w-36 lg:w-56 xl:w-64"
             >
               <Badge
                 variant="destructive"
-                className="absolute left-2.5 top-2.5 z-10 gap-1 px-2 py-0.5 text-[10px]"
+                className="absolute left-1.5 top-1.5 z-10 gap-1 px-1.5 py-0 text-[9px] sm:left-2.5 sm:top-2.5 sm:px-2 sm:py-0.5 sm:text-[10px]"
               >
-                <Tag className="h-3 w-3" />
+                <Tag className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                 Oferta
               </Badge>
               <div className="relative aspect-square w-full bg-white">
@@ -222,20 +222,22 @@ export function OffersMarquee({ offers }: { offers: ProductDTO[] }) {
                   alt={product.name}
                   fill
                   sizes="256px"
-                  className="object-contain p-6"
+                  className="object-contain p-2 sm:p-4 lg:p-6"
                 />
               </div>
-              <div className="flex flex-1 flex-col gap-1 p-3.5">
-                <p className="line-clamp-2 text-sm font-semibold leading-snug text-foreground">
+              <div className="flex flex-1 flex-col gap-0.5 p-2 sm:gap-1 sm:p-2.5 lg:p-3.5">
+                <p className="line-clamp-2 text-[11px] font-semibold leading-snug text-foreground sm:text-xs lg:text-sm">
                   {product.name}
                 </p>
-                <div className="mt-auto flex items-baseline gap-2 pt-1">
+                <div className="mt-auto flex flex-wrap items-baseline gap-1 pt-1 sm:gap-2">
                   {product.originalPrice && (
-                    <span className="text-xs text-muted-foreground line-through">
+                    <span className="text-[10px] text-muted-foreground line-through sm:text-xs">
                       {formatCurrency(product.originalPrice)}
                     </span>
                   )}
-                  <span className="font-bold text-foreground">{formatCurrency(product.price)}</span>
+                  <span className="text-xs font-bold text-foreground sm:text-sm lg:text-base">
+                    {formatCurrency(product.price)}
+                  </span>
                 </div>
               </div>
             </Link>
