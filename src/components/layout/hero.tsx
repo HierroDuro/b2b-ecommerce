@@ -72,17 +72,49 @@ export function Hero({ productCount, showcaseProducts }: HeroProps) {
             </div>
           ))}
         </dl>
+
+        {/* Phone/tablet get the same "cheapest 3, real and clickable"
+            proof as the desktop panel, just as a plain 3-up row instead
+            of a floating collage — that layout only works with the extra
+            width of the two-column desktop grid. */}
+        <div className="mt-6 lg:hidden">
+          <h2 className="mb-2 text-xs font-semibold text-foreground">Los más accesibles</h2>
+          <div className="grid grid-cols-3 gap-2 sm:gap-3">
+            {showcase.map((product) => (
+              <Link
+                key={product.id}
+                href={`/productos/${product.id}`}
+                className="overflow-hidden rounded-lg border border-border bg-card p-2 shadow-soft transition-transform active:scale-95 sm:p-3"
+              >
+                <div className="relative aspect-square w-full overflow-hidden rounded-md bg-white">
+                  <Image
+                    src={product.imageUrl}
+                    alt={product.name}
+                    fill
+                    sizes="140px"
+                    className="object-contain p-2"
+                  />
+                </div>
+                <p className="mt-1.5 line-clamp-1 text-[11px] font-medium text-foreground sm:text-xs">
+                  {product.name}
+                </p>
+                <p className="text-xs font-bold text-primary sm:text-sm">
+                  {formatCurrency(product.price)}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </div>
       </motion.div>
 
-      {/* The product showcase panel is a nice-to-have visual proof, not
-          essential info — on a phone it just pushes the actual catalog
-          further down, so it only shows from `sm` up. Desktop/tablet keep
-          it as the two-column layout's right-hand visual. */}
+      {/* The floating product-collage panel needs the extra width of the
+          two-column desktop grid to breathe — phone and tablet get the
+          plain 3-up row above instead (rendered inline with the text). */}
       <motion.div
         initial={{ opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
-        className="relative mx-auto hidden w-full max-w-md sm:block"
+        className="relative mx-auto hidden w-full max-w-md lg:block"
       >
         <div className="relative aspect-[4/4.4] w-full overflow-hidden rounded-3xl bg-secondary/70">
           {/* Faint dot-grid texture — the only decorative touch, confined to
