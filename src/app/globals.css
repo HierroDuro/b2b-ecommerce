@@ -102,12 +102,17 @@
 }
 
 @layer utilities {
-  /* Smooth, consistent color-scheme transition when toggling dark mode. */
+  /* Smooth, consistent color-scheme transition when toggling dark mode.
+     A longer duration + a gentle "ease-out"-leaning curve (vs. the
+     previous 200ms ease-in-out) reads as a soft fade instead of a snap.
+     fill/stroke are included for any icon using an explicit color instead
+     of `currentColor` (which already rides along with the `color`
+     transition on its own). */
   .theme-transition,
   .theme-transition * {
-    transition-property: background-color, border-color, color, box-shadow;
-    transition-duration: 200ms;
-    transition-timing-function: ease-in-out;
+    transition-property: background-color, border-color, color, box-shadow, fill, stroke;
+    transition-duration: 450ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .scrollbar-thin {
