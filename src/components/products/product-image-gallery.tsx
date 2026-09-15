@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
+import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -43,6 +44,23 @@ export function ProductImageGallery({ images, alt }: ProductImageGalleryProps) {
   const [isZooming, setIsZooming] = React.useState(false);
   const [zoom, setZoom] = React.useState<ZoomState | null>(null);
   const [naturalSize, setNaturalSize] = React.useState<{ w: number; h: number } | null>(null);
+  const [lightboxOpen, setLightboxOpen] = React.useState(false);
+
+  // Close the lightbox on Escape, and lock page scroll behind it while open
+  // (the lightbox itself stays scrollable/pinch-zoomable — see its own div).
+  React.useEffect(() => {
+    if (!lightboxOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightboxOpen(false);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [lightboxOpen]);
 
   const containerRef = React.useRef<HTMLDivElement>(null);
   const wrapperRef = React.useRef<HTMLDivElement>(null);
@@ -143,7 +161,8 @@ export function ProductImageGallery({ images, alt }: ProductImageGalleryProps) {
           ref={containerRef}
           onMouseMove={handleMouseMove}
           onMouseLeave={() => setIsZooming(false)}
-          className="relative aspect-square w-full cursor-crosshair overflow-hidden rounded-xl border border-border bg-white"
+          onClick={() => setLightboxOpen(true)}
+          className="relative aspect-square w-full cursor-zoom-in overflow-hidden rounded-xl border border-border bg-white lg:cursor-crosshair"
         >
           <Image
             ref={imgElRef}
@@ -165,6 +184,13 @@ export function ProductImageGallery({ images, alt }: ProductImageGalleryProps) {
               style={{ left: zoom.lensLeft, top: zoom.lensTop, width: LENS_SIZE, height: LENS_SIZE }}
             />
           )}
+          {/* Desktop already has the hover-zoom lens as its "this can zoom"
+              affordance; phone/tablet get an explicit tap-to-zoom hint since
+              nothing else on a touch screen suggests the image is tappable. */}
+          <span className="pointer-events-none absolute bottom-2 right-2 flex items-center gap-1 rounded-full bg-background/90 px-2.5 py-1 text-[11px] font-medium text-foreground shadow-soft lg:hidden">
+            <ZoomIn className="h-3.5 w-3.5" />
+            Ampliar
+          </span>
         </div>
 
         {isZooming && zoom && activeImage && (
@@ -181,6 +207,70 @@ export function ProductImageGallery({ images, alt }: ProductImageGalleryProps) {
           />
         )}
       </div>
+
+      {lightboxOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/95"
+          onClick={() => setLightboxOpen(false)}
+        >
+          <button
+            type="button"
+            onClick={() => setLightboxOpen(false)}
+            aria-label="Cerrar"
+            className="absolute right-3 top-3 z-10 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
+          >
+            <X className="h-6 w-6" />
+          </button>
+
+          {images.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveIndex((i) => (i - 1 + images.length) % images.length);
+                }}
+                aria-label="Imagen anterior"
+                className="absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
+              >
+                <ChevronLeft className="h-6 w-6" />
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveIndex((i) => (i + 1) % images.length);
+                }}
+                aria-label="Imagen siguiente"
+                className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
+              >
+                <ChevronRight className="h-6 w-6" />
+              </button>
+            </>
+          )}
+
+          {/* Scrollable, not `overflow-hidden` — that's what lets the
+              browser's native pinch-zoom / pan actually work once zoomed
+              in, same as a photo viewer. No custom gesture code needed. */}
+          <div
+            className="h-full w-full overflow-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex min-h-full items-center justify-center p-6">
+              {/* Plain <img>, not next/image — the lightbox needs the
+                  photo at its natural size so pinch-zoom has real detail
+                  to zoom into, not a viewport-fitted `fill` box. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={activeImage}
+                alt={alt}
+                className="max-h-none max-w-none"
+                style={{ width: "min(90vw, 700px)", height: "auto" }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
