@@ -78,6 +78,16 @@ const nextConfig: NextConfig = {
     remotePatterns: [],
     formats: ["image/avif", "image/webp"],
   },
+  // Files uploaded after boot aren't in Next's static file list — route
+  // /uploads/* through a handler that reads them from disk (see
+  // src/app/api/files). beforeFiles so it wins over the public/ lookup.
+  async rewrites() {
+    return {
+      beforeFiles: [{ source: "/uploads/:path*", destination: "/api/files/:path*" }],
+      afterFiles: [],
+      fallback: [],
+    };
+  },
   async headers() {
     return [
       {
