@@ -14,7 +14,7 @@ export function RegisterPageContent() {
       <p className="mb-6 text-sm text-muted-foreground">
         Registrate para consultar por productos y hacer seguimiento de tus conversaciones.
       </p>
-      <CustomerRegisterForm onSuccess={() => router.push("/consultas")} />
+      <CustomerRegisterForm onSuccess={() => router.push("/")} />
       <p className="mt-6 text-center text-sm text-muted-foreground">
         ¿Ya tenés cuenta?{" "}
         <Link href="/cuenta/ingresar" className="text-primary hover:underline">
