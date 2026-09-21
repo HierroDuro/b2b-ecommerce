@@ -102,7 +102,21 @@ export function AccountBar() {
   }
 
   return (
-    <div className="absolute right-6 top-2 hidden md:block lg:right-10">
+    <div className="absolute right-6 top-2 hidden items-center gap-2 md:flex lg:right-10">
+      {/* Always visible (not buried in the menu): the inbox is a main action. */}
+      <Link
+        href="/consultas"
+        aria-label="Mis consultas"
+        className="flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-1.5 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+      >
+        <MessageCircle className="h-3.5 w-3.5" />
+        <span className="hidden lg:inline">Mis consultas</span>
+        {unread > 0 && (
+          <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold text-destructive-foreground">
+            {unread}
+          </span>
+        )}
+      </Link>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
@@ -114,9 +128,8 @@ export function AccountBar() {
               <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-60" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
             </span>
-            <span className="text-muted-foreground">Sesión iniciada</span>
+            <span className="hidden text-muted-foreground lg:inline">Sesión iniciada</span>
             <span className="font-semibold text-foreground">Hola, {firstName}</span>
-            {unread > 0 && <UnreadBadge count={unread} />}
             <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
           </button>
         </DropdownMenuTrigger>
@@ -176,21 +189,28 @@ export function AccountMenu() {
   }
 
   return (
-    <div className="md:hidden">
+    <div className="flex flex-col items-end gap-0.5 md:hidden">
+      <Link
+        href="/consultas"
+        aria-label="Mis consultas"
+        className="relative flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground"
+      >
+        <MessageCircle className="h-4 w-4" />
+        {unread > 0 && (
+          <span className="absolute -right-1 -top-1">
+            <UnreadBadge count={unread} />
+          </span>
+        )}
+      </Link>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
             type="button"
             aria-label="Menú de tu cuenta"
-            className="relative flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold uppercase text-primary"
+            className="relative flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold uppercase text-primary"
           >
             {firstName.charAt(0)}
             <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-background bg-emerald-500" />
-            {unread > 0 && (
-              <span className="absolute -right-1 -top-1">
-                <UnreadBadge count={unread} />
-              </span>
-            )}
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="min-w-56">

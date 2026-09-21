@@ -63,7 +63,7 @@ export function Header() {
             <SearchBar />
           </div>
           <AccountMenu />
-          <ThemeToggle />
+          <ThemeToggle className="h-8 w-8 md:h-10 md:w-10" />
         </div>
       </div>
     </header>

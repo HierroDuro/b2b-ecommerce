@@ -6,13 +6,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Moon, Sun } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 /**
  * Dark mode toggle for the header. Renders nothing meaningful until
  * mounted client-side (theme is unknown during SSR) to avoid hydration
  * mismatches, per next-themes' documented pattern.
  */
-export function ThemeToggle() {
+export function ThemeToggle({ className }: { className?: string }) {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
 
@@ -26,7 +27,7 @@ export function ThemeToggle() {
       size="icon"
       aria-label="Cambiar modo oscuro"
       onClick={toggle}
-      className="relative rounded-full text-muted-foreground hover:text-foreground"
+      className={cn("relative rounded-full text-muted-foreground hover:text-foreground", className)}
     >
       <AnimatePresence mode="wait" initial={false}>
         {mounted && resolvedTheme === "dark" ? (
