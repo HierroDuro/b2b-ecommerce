@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight, MessageCircle, Phone } from "lucide-react";
+import { MessageCircle, Phone } from "lucide-react";
 
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
@@ -31,11 +31,6 @@ const services = [
   },
 ];
 
-function inquiryHref(service: string) {
-  const subject = encodeURIComponent(`Consulta: ${service}`);
-  return `mailto:${siteConfig.contact.email}?subject=${subject}`;
-}
-
 export default function ServiciosPage() {
   return (
     <div className="min-h-screen">
@@ -57,7 +52,7 @@ export default function ServiciosPage() {
           {services.map(({ title, desc, image }) => (
             <article
               key={title}
-              className="flex overflow-hidden rounded-xl border border-border bg-card shadow-soft transition-shadow hover:border-primary/30 hover:shadow-card-hover"
+              className="flex min-h-40 overflow-hidden rounded-xl border border-border bg-card shadow-soft transition-shadow hover:border-primary/30 hover:shadow-card-hover sm:min-h-44"
             >
               <div className="relative w-32 shrink-0 bg-white sm:w-44">
                 <Image src={image} alt={title} fill sizes="176px" className="object-cover" />
@@ -66,13 +61,6 @@ export default function ServiciosPage() {
                 <h2 className="font-semibold leading-snug text-foreground">{title}</h2>
                 <span aria-hidden className="mt-3 h-0.5 w-12 rounded-full bg-primary" />
                 <p className="mt-3 text-sm text-muted-foreground">{desc}</p>
-                <a
-                  href={inquiryHref(title)}
-                  className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-medium text-primary underline-offset-4 hover:underline"
-                >
-                  Consultar
-                  <ChevronRight className="h-4 w-4" />
-                </a>
               </div>
             </article>
           ))}
