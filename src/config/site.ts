@@ -4,8 +4,8 @@
  * sync with a single source of truth.
  */
 export const siteConfig = {
-  name: "Meridian B2B",
-  shortName: "Meridian",
+  name: "Fitotecno",
+  shortName: "Fitotecno",
   description:
     "Plataforma B2B de tecnología, resmas y artículos gráficos. Catálogo actualizado, precios preferenciales y stock en tiempo real para empresas.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",

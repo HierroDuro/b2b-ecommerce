@@ -46,7 +46,7 @@ export function Footer() {
 
         <div className="space-y-3">
           <h3 className="text-sm font-semibold text-foreground">Contacto</h3>
-          <p className="text-sm text-muted-foreground">ventas@{siteConfig.shortName.toLowerCase()}.com</p>
+          <p className="text-sm text-muted-foreground">ventas@fitotecno.tech</p>
           <p className="text-sm text-muted-foreground">Lun a Vie, 9 a 18 h</p>
         </div>
       </div>

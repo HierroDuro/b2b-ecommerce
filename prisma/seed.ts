@@ -87,7 +87,7 @@ async function main() {
   const existingConfig = await prisma.siteConfig.findFirst();
   if (!existingConfig) {
     await prisma.siteConfig.create({
-      data: { siteName: "Meridian B2B", currency: "ARS" },
+      data: { siteName: "Fitotecno", currency: "ARS" },
     });
     console.log("✔ Configuración del sitio creada");
   }
