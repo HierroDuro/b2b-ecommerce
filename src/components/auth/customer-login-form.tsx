@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -70,14 +71,24 @@ export function CustomerLoginForm({ onSuccess, onSwitchToForgotPassword }: Custo
         {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Ingresar"}
       </Button>
 
-      {onSwitchToForgotPassword && (
+      {/* In the auth dialog the parent swaps views in place; on the standalone
+          /cuenta/ingresar page there's no parent callback, so link to the
+          recovery page instead — otherwise the option simply never appears. */}
+      {onSwitchToForgotPassword ? (
         <button
           type="button"
           onClick={onSwitchToForgotPassword}
-          className="w-full text-center text-xs text-muted-foreground hover:text-foreground hover:underline"
+          className="w-full text-center text-sm text-primary hover:underline"
         >
           ¿Olvidaste tu contraseña?
         </button>
+      ) : (
+        <Link
+          href="/cuenta/recuperar"
+          className="block w-full text-center text-sm text-primary hover:underline"
+        >
+          ¿Olvidaste tu contraseña?
+        </Link>
       )}
     </form>
   );
