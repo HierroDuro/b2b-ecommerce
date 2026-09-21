@@ -7,7 +7,7 @@ import { ChevronDown } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { SearchBar } from "@/components/products/search-bar";
-import { AccountMenu } from "@/components/layout/account-menu";
+import { AccountBar, AccountMenu } from "@/components/layout/account-menu";
 import { SiteLogo } from "@/components/layout/site-logo";
 import { cn } from "@/lib/utils";
 
@@ -28,7 +28,7 @@ export function Header() {
       )}
       style={{ height: "var(--header-h)" }}
     >
-      <div className="mx-auto grid h-full max-w-[1920px] grid-cols-[1fr_auto_1fr] items-center gap-2 px-2 md:gap-4 md:px-6 lg:px-10">
+      <div className="relative mx-auto grid h-full max-w-[1920px] grid-cols-[1fr_auto_1fr] items-center gap-2 px-2 md:gap-4 md:px-6 lg:px-10">
         {/* Left zone: primary navigation. Only from lg up — below that the
             big centered logo leaves no room for it; the same links live in
             the footer. The wrapper div stays in the grid so the logo keeps
@@ -52,6 +52,10 @@ export function Header() {
         <Link href="/" aria-label="Inicio" className="justify-self-center">
           <SiteLogo priority />
         </Link>
+
+        {/* Tablet/desktop account strip, pinned to the top-right corner (it
+            floats above the search bar, so it costs no extra header height). */}
+        <AccountBar />
 
         {/* Right zone: search + actions */}
         <div className="flex min-w-0 flex-col items-end justify-center gap-0.5 md:flex-row md:items-center md:justify-end md:gap-2 lg:gap-4">
