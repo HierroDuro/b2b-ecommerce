@@ -64,11 +64,11 @@ export function Hero({ productCount, showcaseProducts }: HeroProps) {
           </Link>
         </div>
 
-        <dl className="mt-6 grid grid-cols-2 gap-x-4 gap-y-3 sm:mt-10 sm:gap-y-4 sm:grid-cols-4">
+        <dl className="mt-6 grid grid-cols-2 gap-x-4 gap-y-3 sm:mt-10 sm:flex sm:flex-wrap sm:items-center sm:gap-x-8 sm:gap-y-3">
           {valueProps.map(({ icon: Icon, label }) => (
             <div key={label} className="flex items-center gap-2">
               <Icon className="h-4 w-4 shrink-0 text-primary" />
-              <span className="text-xs font-medium text-muted-foreground">{label}</span>
+              <span className="whitespace-nowrap text-xs font-medium text-muted-foreground">{label}</span>
             </div>
           ))}
         </dl>
