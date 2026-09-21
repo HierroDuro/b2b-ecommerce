@@ -17,7 +17,7 @@ interface HeroProps {
 const valueProps: { icon: LucideIcon; label: string }[] = [
   { icon: Boxes, label: "Catálogo amplio" },
   { icon: Tag, label: "Precios competitivos" },
-  { icon: Truck, label: "Envíos a todo el país" },
+  { icon: Truck, label: "Envíos" },
   { icon: MessageCircle, label: "Atención directa" },
 ];
 
