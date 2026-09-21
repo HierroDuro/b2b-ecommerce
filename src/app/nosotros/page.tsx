@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin } from "lucide-react";
+import { MapPin, Phone } from "lucide-react";
 
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
@@ -110,12 +110,21 @@ export default async function NosotrosPage() {
               Explorá el catálogo completo o llamanos al {siteConfig.contact.phone}.
             </p>
           </div>
-          <Link
-            href="/"
-            className="inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-soft transition-transform hover:scale-105"
-          >
-            Ver catálogo
-          </Link>
+          <div className="flex shrink-0 flex-wrap items-center justify-center gap-3">
+            <a
+              href={siteConfig.contact.phoneHref}
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-soft transition-transform hover:scale-105"
+            >
+              <Phone className="h-4 w-4" />
+              Llamar
+            </a>
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary/40 hover:text-primary"
+            >
+              Ver catálogo
+            </Link>
+          </div>
         </div>
       </main>
       <Footer />
