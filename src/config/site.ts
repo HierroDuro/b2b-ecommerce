@@ -21,8 +21,8 @@ export const siteConfig = {
     phoneHref: "tel:+541143312412",
   },
   branches: [
-    { name: "Moreno 450", image: "/nosotros/sucursal-moreno-450.jpg" },
-    { name: "Moreno 451", image: "/nosotros/sucursal-moreno-451.jpg" },
-    { name: "Perú 299", image: "/nosotros/sucursal-peru-299.jpg" },
+    { name: "Moreno 450", image: "/nosotros/sucursal-moreno-450.jpg", portrait: false },
+    { name: "Moreno 451", image: "/nosotros/sucursal-moreno-451.jpg", portrait: false },
+    { name: "Perú 299", image: "/nosotros/sucursal-peru-299.jpg", portrait: true },
   ],
 } as const;

@@ -75,20 +75,29 @@ export default async function NosotrosPage() {
           <MapPin className="h-5 w-5 text-primary" />
           Nuestras sucursales
         </h2>
-        <div className="mt-6 grid gap-6 sm:grid-cols-3">
+        {/* Mosaic: the two landscape photos stack on the left, the tall Perú 299
+            photo spans both rows on the right — so no photo gets cropped to a
+            strip of shutter. Captions sit on the photo so row heights are
+            driven purely by the images. */}
+        <div className="mt-6 grid max-w-3xl gap-4 sm:grid-cols-2">
           {siteConfig.branches.map((branch) => (
-            <figure key={branch.name}>
-              <div className="relative aspect-[4/3] overflow-hidden rounded-xl border border-border shadow-soft">
-                <Image
-                  src={branch.image}
-                  alt={`Sucursal ${branch.name}, C.A.B.A.`}
-                  fill
-                  sizes="(min-width: 640px) 33vw, 100vw"
-                  className="object-cover"
-                />
-              </div>
-              <figcaption className="mt-3 text-center text-sm text-muted-foreground">
-                Sucursal {branch.name}. C.A.B.A.
+            <figure
+              key={branch.name}
+              className={
+                branch.portrait
+                  ? "relative aspect-[3/4] overflow-hidden rounded-xl border border-border shadow-soft sm:col-start-2 sm:row-span-2 sm:row-start-1 sm:aspect-auto"
+                  : "relative aspect-[4/3] overflow-hidden rounded-xl border border-border shadow-soft sm:col-start-1"
+              }
+            >
+              <Image
+                src={branch.image}
+                alt={`Sucursal ${branch.name}, C.A.B.A.`}
+                fill
+                sizes="(min-width: 768px) 384px, 100vw"
+                className="object-cover"
+              />
+              <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-4 pb-3 pt-10 text-sm font-medium text-white">
+                Sucursal {branch.name} · C.A.B.A.
               </figcaption>
             </figure>
           ))}
