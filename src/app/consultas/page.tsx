@@ -6,7 +6,6 @@ import { Footer } from "@/components/layout/footer";
 import { CustomerConversationsList } from "@/components/chat/customer-conversations-list";
 import { getCustomerConversations } from "@/actions/chat-actions";
 import { requireCustomerSession } from "@/lib/require-customer";
-import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
   title: "Mis consultas",
@@ -24,7 +23,7 @@ export default async function MyConversationsPage() {
       <Header />
       <main
         className="mx-auto max-w-2xl px-6 pb-24 lg:px-10"
-        style={{ paddingTop: siteConfig.headerHeight + 32 }}
+        style={{ paddingTop: "calc(var(--header-h) + 32px)" }}
       >
         <h1 className="text-2xl font-bold tracking-tight text-foreground">Mis consultas</h1>
         <p className="mt-1 text-sm text-muted-foreground">

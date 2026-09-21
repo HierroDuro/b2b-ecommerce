@@ -10,7 +10,6 @@ import { ConversationStatusBadge } from "@/components/chat/conversation-status-b
 import { ChatThread } from "@/components/chat/chat-thread";
 import { getConversationProductContext } from "@/actions/chat-actions";
 import { requireCustomerSession } from "@/lib/require-customer";
-import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
   title: "Consulta",
@@ -41,7 +40,7 @@ export default async function ConversationPage({
       <Header />
       <main
         className="mx-auto max-w-2xl px-6 pb-24 lg:px-10"
-        style={{ paddingTop: siteConfig.headerHeight + 32 }}
+        style={{ paddingTop: "calc(var(--header-h) + 32px)" }}
       >
         <Link
           href="/consultas"

@@ -98,7 +98,7 @@ export default async function ProductPage({ params }: ProductPageParams) {
       />
       <main
         className="mx-auto max-w-6xl px-6 pb-24 lg:px-10"
-        style={{ paddingTop: siteConfig.headerHeight + 32 }}
+        style={{ paddingTop: "calc(var(--header-h) + 32px)" }}
       >
         <nav aria-label="Breadcrumb" className="mb-6 flex items-center gap-1.5 text-sm text-muted-foreground">
           <Link href="/" className="hover:text-foreground">

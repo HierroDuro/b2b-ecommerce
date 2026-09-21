@@ -14,5 +14,4 @@ export const siteConfig = {
     { label: "Servicios", href: "/servicios" },
     { label: "Nosotros", href: "/nosotros" },
   ],
-  headerHeight: 75, // px — kept in one place so layout offsets never drift
 } as const;

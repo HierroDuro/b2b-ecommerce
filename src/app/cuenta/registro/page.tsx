@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { RegisterPageContent } from "@/components/auth/register-page-content";
-import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
   title: "Crear cuenta",
@@ -16,7 +15,7 @@ export default function RegisterPage() {
       <Header />
       <main
         className="mx-auto flex max-w-md flex-col justify-center px-6 pb-24"
-        style={{ paddingTop: siteConfig.headerHeight + 48, minHeight: "70vh" }}
+        style={{ paddingTop: "calc(var(--header-h) + 48px)", minHeight: "70vh" }}
       >
         <RegisterPageContent />
       </main>

@@ -46,7 +46,7 @@ export default async function NosotrosPage() {
       <Header />
       <main
         className="mx-auto max-w-5xl px-6 pb-24 lg:px-10"
-        style={{ paddingTop: siteConfig.headerHeight + 48 }}
+        style={{ paddingTop: "calc(var(--header-h) + 48px)" }}
       >
         <div className="max-w-2xl">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/80 px-3 py-1 text-xs font-medium text-muted-foreground shadow-soft">

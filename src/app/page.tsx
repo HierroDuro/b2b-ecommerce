@@ -4,7 +4,6 @@ import { Hero, OffersMarquee } from "@/components/layout/hero";
 import { Storefront } from "@/components/products/storefront";
 import { SearchBar } from "@/components/products/search-bar";
 import { prisma } from "@/lib/prisma";
-import { siteConfig } from "@/config/site";
 import type { CategoryDTO, ProductDTO } from "@/types/product";
 
 // Product data changes often (stock, prices), so this page revalidates
@@ -88,16 +87,16 @@ export default async function HomePage() {
       <Header />
       <main
         className="mx-auto max-w-[1920px] px-6 pb-20 lg:px-10"
-        style={{ paddingTop: siteConfig.headerHeight + 32 }}
+        style={{ paddingTop: "calc(var(--header-h) + 32px)" }}
       >
         <Hero productCount={productCount} showcaseProducts={showcaseProducts} />
 
-        <div id="catalogo" className="scroll-mt-24">
+        <div id="catalogo" className="scroll-mt-[calc(var(--header-h)+16px)]">
           <OffersMarquee offers={onSaleProducts} />
 
           {/* The header's search bar is hidden below `md`; this gives mobile
               users the same real-time search without cramming it into the
-              fixed 75px header. */}
+              fixed header. */}
           <div className="mb-5 md:hidden">
             <SearchBar />
           </div>

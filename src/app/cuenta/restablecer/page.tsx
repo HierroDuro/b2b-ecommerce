@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { ResetPasswordForm } from "@/components/auth/reset-password-form";
-import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
   title: "Restablecer contraseña",
@@ -22,7 +21,7 @@ export default async function ResetPasswordPage({
       <Header />
       <main
         className="mx-auto flex max-w-md flex-col justify-center px-6 pb-24"
-        style={{ paddingTop: siteConfig.headerHeight + 48, minHeight: "70vh" }}
+        style={{ paddingTop: "calc(var(--header-h) + 48px)", minHeight: "70vh" }}
       >
         <div className="rounded-xl border border-border bg-card p-8 shadow-card">
           <h1 className="mb-1 text-xl font-semibold text-foreground">Elegir nueva contraseña</h1>

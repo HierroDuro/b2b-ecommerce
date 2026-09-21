@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 
 import { FilterPanelContent } from "@/components/products/filter-panel-content";
 import type { CategoryDTO } from "@/types/product";
-import { siteConfig } from "@/config/site";
 
 /**
  * Desktop-only sticky sidebar (stays pinned under the header while the
@@ -18,7 +17,7 @@ export function SidebarFilters({ categories }: { categories: CategoryDTO[] }) {
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
       className="sticky hidden w-full max-w-[260px] shrink-0 self-start lg:block"
-      style={{ top: siteConfig.headerHeight + 24 }}
+      style={{ top: "calc(var(--header-h) + 24px)" }}
     >
       <div className="rounded-xl border border-border bg-card p-6 shadow-soft">
         <FilterPanelContent categories={categories} />

@@ -15,7 +15,7 @@ interface SiteLogoProps {
  */
 export function SiteLogo({ className, priority }: SiteLogoProps) {
   return (
-    <span className="inline-flex rounded-md dark:bg-white dark:px-2 dark:py-0.5">
+    <span className="inline-flex rounded-md dark:bg-white dark:px-2 dark:py-1">
       <Image
         src="/logo.png"
         alt="Logo"
@@ -25,7 +25,7 @@ export function SiteLogo({ className, priority }: SiteLogoProps) {
         // Served as-is: the optimizer's lossy re-encode turned the thin
         // white stripes inside the letters into mush at this small size.
         unoptimized
-        className={cn("h-14 w-auto sm:h-16 lg:h-[4.25rem]", className)}
+        className={cn("h-[5.5rem] w-auto md:h-24 lg:h-32", className)}
       />
     </span>
   );

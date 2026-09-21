@@ -101,6 +101,22 @@
   }
 }
 
+/* Header height, per breakpoint — the logo fills it, so it is deliberately
+   tall. Everything that must clear the fixed header reads this variable. */
+:root {
+  --header-h: 108px;
+}
+@media (min-width: 768px) {
+  :root {
+    --header-h: 116px;
+  }
+}
+@media (min-width: 1024px) {
+  :root {
+    --header-h: 140px;
+  }
+}
+
 @layer utilities {
   /* Dark/light mode switches instantly on click — no animated transition.
      Tried animating it (background-color/color, then also tried without
