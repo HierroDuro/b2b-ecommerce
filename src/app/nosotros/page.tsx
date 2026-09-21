@@ -78,7 +78,7 @@ export default async function NosotrosPage() {
         <div className="mt-6 grid gap-6 sm:grid-cols-3">
           {siteConfig.branches.map((branch) => (
             <figure key={branch.name}>
-              <div className="relative aspect-[350/211] overflow-hidden rounded-xl border border-border shadow-soft">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-xl border border-border shadow-soft">
                 <Image
                   src={branch.image}
                   alt={`Sucursal ${branch.name}, C.A.B.A.`}
