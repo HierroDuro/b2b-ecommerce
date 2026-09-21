@@ -148,12 +148,10 @@ model User {
   @@map("users")
 }
 
-/// Token de un solo uso para "recuperar contraseña". En este entorno de
-/// desarrollo no hay proveedor de email configurado, así que el enlace de
-/// recupero se muestra directamente en la pantalla en vez de enviarse por
-/// correo — ver `requestPasswordReset` en customer-auth-actions.ts. Para
-/// producción, reemplazar ese paso por el envío real del link por email
-/// (Resend, SES, etc.) sin tocar el resto del flujo.
+/// Token de un solo uso para "recuperar contraseña". El enlace se envía por
+/// email (ver `requestPasswordReset` en customer-auth-actions.ts y
+/// src/lib/mailer.ts). Acá se guarda solo el SHA-256 del token, nunca el
+/// valor en claro: el original existe únicamente dentro del enlace enviado.
 model PasswordResetToken {
   id        String    @id @default(cuid())
   token     String    @unique

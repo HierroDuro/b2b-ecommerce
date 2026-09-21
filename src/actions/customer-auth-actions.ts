@@ -6,6 +6,14 @@ import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { siteConfig } from "@/config/site";
+import { sendMail } from "@/lib/mailer";
+import { passwordChangedEmail, passwordResetEmail } from "@/lib/email-templates";
+import {
+  RESET_COOLDOWN_MS,
+  RESET_TOKEN_TTL_MS,
+  hashResetToken,
+  maskEmail,
+} from "@/lib/password-reset";
 import {
   registerSchema,
   forgotPasswordSchema,
@@ -16,10 +24,9 @@ import {
 } from "@/lib/validations/customer-auth.schema";
 
 const BCRYPT_ROUNDS = 12;
-const RESET_TOKEN_TTL_MS = 60 * 60 * 1000; // 1 hour
 
 export type CustomerAuthResult =
-  | { success: true; message: string; resetUrl?: string }
+  | { success: true; message: string; maskedEmail?: string }
   | { success: false; message: string; fieldErrors?: Record<string, string[]> };
 
 /** Creates a customer account. The caller signs the session in afterward client-side. */
@@ -51,39 +58,66 @@ export async function registerCustomer(input: RegisterInput): Promise<CustomerAu
 }
 
 /**
- * Starts a password reset. There's no email provider configured in this
- * project (see prisma/schema.prisma's PasswordResetToken doc comment), so
- * instead of emailing the link, it's returned directly for the UI to show
- * — clearly labeled as a dev-mode stand-in. Wire a real email provider
- * (Resend, SES, etc.) before shipping this to production; sending it by
- * email is also what restores the usual "doesn't reveal whether the email
- * exists" property, which this dev-mode shortcut necessarily gives up.
+ * Starts a password reset by emailing a one-time link.
+ *
+ * Deliberately answers the same way whether or not the email belongs to an
+ * account (no "no encontramos esa cuenta"), so this endpoint can't be used
+ * to discover which emails are registered. The link is NEVER returned to
+ * the browser — it only travels by email. The send is fire-and-forget so
+ * response time doesn't differ between existing and unknown emails.
  */
 export async function requestPasswordReset(
   input: ForgotPasswordInput,
 ): Promise<CustomerAuthResult> {
   const parsed = forgotPasswordSchema.safeParse(input);
   if (!parsed.success) {
-    return { success: false, message: "Email inválido." };
+    return { success: false, message: "Ingresá un email válido." };
   }
 
-  const user = await prisma.user.findUnique({ where: { email: parsed.data.email.toLowerCase() } });
-  if (!user) {
-    return {
-      success: false,
-      message: "No encontramos ninguna cuenta con ese email.",
-    };
-  }
+  const email = parsed.data.email.toLowerCase();
+  const user = await prisma.user.findUnique({ where: { email } });
 
-  const token = randomBytes(32).toString("hex");
-  await prisma.passwordResetToken.create({
-    data: { token, userId: user.id, expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS) },
-  });
+  if (user) {
+    const recent = await prisma.passwordResetToken.findFirst({
+      where: {
+        userId: user.id,
+        usedAt: null,
+        createdAt: { gt: new Date(Date.now() - RESET_COOLDOWN_MS) },
+      },
+    });
+
+    // Within the cooldown a mail was just sent — don't spam the inbox.
+    if (!recent) {
+      // Only the newest link works: drop any earlier unused ones.
+      await prisma.passwordResetToken.deleteMany({ where: { userId: user.id, usedAt: null } });
+
+      const token = randomBytes(32).toString("hex");
+      const hashed = hashResetToken(token);
+      await prisma.passwordResetToken.create({
+        data: {
+          token: hashed,
+          userId: user.id,
+          expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS),
+        },
+      });
+
+      const mail = passwordResetEmail({
+        name: user.name,
+        url: `${siteConfig.url}/cuenta/restablecer?token=${token}`,
+        expiresInMinutes: RESET_TOKEN_TTL_MS / 60000,
+      });
+
+      void sendMail({ to: user.email, ...mail }).then(async (sent) => {
+        // Nothing reached the user: free the cooldown so they can retry.
+        if (!sent) await prisma.passwordResetToken.deleteMany({ where: { token: hashed } });
+      });
+    }
+  }
 
   return {
     success: true,
-    message: "Enlace de recuperación generado.",
-    resetUrl: `${siteConfig.url}/cuenta/restablecer?token=${token}`,
+    message: "Si el email está registrado, te enviamos un correo con las instrucciones.",
+    maskedEmail: maskEmail(email),
   };
 }
 
@@ -99,7 +133,10 @@ export async function resetPassword(input: ResetPasswordInput): Promise<Customer
 
   const { token, password } = parsed.data;
 
-  const resetToken = await prisma.passwordResetToken.findUnique({ where: { token } });
+  const resetToken = await prisma.passwordResetToken.findUnique({
+    where: { token: hashResetToken(token) },
+    include: { user: { select: { name: true, email: true } } },
+  });
   if (!resetToken || resetToken.usedAt || resetToken.expiresAt < new Date()) {
     return { success: false, message: "El enlace de recuperación no es válido o ya expiró." };
   }
@@ -108,8 +145,12 @@ export async function resetPassword(input: ResetPasswordInput): Promise<Customer
 
   await prisma.$transaction([
     prisma.user.update({ where: { id: resetToken.userId }, data: { passwordHash } }),
-    prisma.passwordResetToken.update({ where: { id: resetToken.id }, data: { usedAt: new Date() } }),
+    // Burn every outstanding link for this account, not just the one used.
+    prisma.passwordResetToken.deleteMany({ where: { userId: resetToken.userId } }),
   ]);
+
+  // Security notice ("was this you?") — best effort, never blocks the reset.
+  void sendMail({ to: resetToken.user.email, ...passwordChangedEmail({ name: resetToken.user.name }) });
 
   return { success: true, message: "Contraseña actualizada. Ya podés iniciar sesión." };
 }
