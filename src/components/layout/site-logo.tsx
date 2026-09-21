@@ -19,10 +19,13 @@ export function SiteLogo({ className, priority }: SiteLogoProps) {
       <Image
         src="/logo.png"
         alt="Logo"
-        width={800}
-        height={278}
+        width={640}
+        height={222}
         priority={priority}
-        className={cn("h-9 w-auto sm:h-10", className)}
+        // Served as-is: the optimizer's lossy re-encode turned the thin
+        // white stripes inside the letters into mush at this small size.
+        unoptimized
+        className={cn("h-12 w-auto sm:h-14 lg:h-[3.75rem]", className)}
       />
     </span>
   );

@@ -15,7 +15,7 @@ export function Footer() {
     <footer className="border-t border-border bg-background">
       <div className="mx-auto grid max-w-[1920px] gap-10 px-6 py-12 sm:grid-cols-2 lg:grid-cols-4 lg:px-10">
         <div className="space-y-3">
-          <SiteLogo />
+          <SiteLogo className="h-14 sm:h-14 lg:h-16" />
           <p className="max-w-xs text-sm text-muted-foreground">{siteConfig.description}</p>
         </div>
 

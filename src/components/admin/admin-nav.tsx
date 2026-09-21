@@ -106,7 +106,7 @@ export function AdminNav({ username }: { username: string }) {
       {/* Mobile: top bar with a hamburger menu instead of the fixed sidebar. */}
       <div className="flex items-center justify-between border-b border-border bg-card px-4 py-3 md:hidden">
         <div className="flex items-center gap-2">
-          <SiteLogo className="h-7 sm:h-7" />
+          <SiteLogo className="h-9 sm:h-9" />
           <span className="text-sm font-semibold text-foreground">Panel de administración</span>
         </div>
         <Dialog open={mobileOpen} onOpenChange={setMobileOpen}>
