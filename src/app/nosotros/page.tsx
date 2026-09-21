@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { ShieldCheck, PackageSearch, Truck, RefreshCw, type LucideIcon } from "lucide-react";
+import { MapPin } from "lucide-react";
 
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
@@ -9,37 +10,22 @@ import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
   title: "Nosotros",
-  description: `Conocé a ${siteConfig.name}, tu proveedor B2B de confianza.`,
+  description:
+    "Somos FITOGRAF, una librería comercial, artística, escolar e imprenta ubicada en el Microcentro. Más de 20 años proveyendo soluciones con la más alta calidad.",
 };
-
-const values: { icon: LucideIcon; title: string; desc: string }[] = [
-  {
-    icon: ShieldCheck,
-    title: "Precios competitivos",
-    desc: "Buenos precios en todo el catálogo, sin condiciones ni letra chica.",
-  },
-  {
-    icon: RefreshCw,
-    title: "Stock en tiempo real",
-    desc: "El catálogo refleja lo que realmente hay disponible, sin sorpresas al momento de comprar.",
-  },
-  {
-    icon: Truck,
-    title: "Logística propia",
-    desc: "Coordinamos la entrega a todo el país con seguimiento de punta a punta.",
-  },
-  {
-    icon: PackageSearch,
-    title: "Catálogo variado",
-    desc: "Tecnología, resmas y artículos gráficos en un solo lugar, sin multiplicar proveedores.",
-  },
-];
 
 export default async function NosotrosPage() {
   const [productCount, categoryCount] = await Promise.all([
     prisma.product.count({ where: { isActive: true } }),
     prisma.category.count(),
   ]);
+
+  const stats = [
+    { label: "Años de trayectoria", value: "+20" },
+    { label: "Sucursales", value: String(siteConfig.branches.length) },
+    { label: "Productos", value: String(productCount) },
+    { label: "Categorías", value: String(categoryCount) },
+  ];
 
   return (
     <div className="min-h-screen">
@@ -48,24 +34,33 @@ export default async function NosotrosPage() {
         className="mx-auto max-w-5xl px-6 pb-24 lg:px-10"
         style={{ paddingTop: "calc(var(--header-h) + 48px)" }}
       >
-        <div className="max-w-2xl">
+        <div className="max-w-3xl">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/80 px-3 py-1 text-xs font-medium text-muted-foreground shadow-soft">
             Quiénes somos
           </span>
           <h1 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Conectamos tu empresa con lo que <span className="text-gradient-aurora">necesita</span>
+            Somos <span className="text-gradient-aurora">FITOGRAF</span>, una librería comercial,
+            artística, escolar e imprenta ubicada en el Microcentro.
           </h1>
-          <p className="mt-4 text-muted-foreground">
-            En {siteConfig.name} conectamos empresas con el mejor catálogo de tecnología, resmas y
-            artículos gráficos, con stock actualizado y atención personalizada.
-          </p>
+          <div className="mt-6 space-y-4 leading-relaxed text-muted-foreground">
+            <p>
+              Hace más de 20 años nos dedicamos a proveer al cliente todas las soluciones y con la
+              más alta calidad.
+            </p>
+            <p>
+              En FITOGRAF tenemos el más amplio stock de insumos para la oficina y nuestra Imprenta
+              está en continua evolución para ofrecer soluciones gráficas con el mejor resultado del
+              mercado.
+            </p>
+            <p>
+              Entre nuestros clientes se encuentran Organizaciones, Empresas, Pymes, Emprendedores
+              hasta Estudiantes que confían día a día en nuestra Calidad y Servicio.
+            </p>
+          </div>
         </div>
 
-        <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3">
-          {[
-            { label: "Productos", value: productCount },
-            { label: "Categorías", value: categoryCount },
-          ].map((stat) => (
+        <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          {stats.map((stat) => (
             <div
               key={stat.label}
               className="rounded-xl border border-border bg-card px-5 py-4 text-center shadow-soft sm:text-left"
@@ -74,26 +69,28 @@ export default async function NosotrosPage() {
               <p className="mt-0.5 text-xs font-medium text-muted-foreground">{stat.label}</p>
             </div>
           ))}
-          <div className="rounded-xl border border-border bg-card px-5 py-4 text-center shadow-soft sm:text-left">
-            <p className="text-2xl font-bold text-gradient-aurora">Lun a Vie</p>
-            <p className="mt-0.5 text-xs font-medium text-muted-foreground">Atención 9 a 18 h</p>
-          </div>
         </div>
 
-        <div className="mt-14 grid gap-6 sm:grid-cols-2">
-          {values.map(({ icon: Icon, title, desc }) => (
-            <div
-              key={title}
-              className="group flex gap-4 rounded-xl border border-border bg-card p-6 shadow-soft transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_18px_40px_-16px_hsl(var(--primary)/0.35)]"
-            >
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-[hsl(var(--aurora-2))] text-primary-foreground transition-transform group-hover:scale-110">
-                <Icon className="h-5 w-5" />
-              </span>
-              <div>
-                <h2 className="font-semibold text-foreground">{title}</h2>
-                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{desc}</p>
+        <h2 className="mt-14 flex items-center gap-2 text-xl font-semibold text-foreground">
+          <MapPin className="h-5 w-5 text-primary" />
+          Nuestras sucursales
+        </h2>
+        <div className="mt-6 grid gap-6 sm:grid-cols-3">
+          {siteConfig.branches.map((branch) => (
+            <figure key={branch.name}>
+              <div className="relative aspect-[350/211] overflow-hidden rounded-xl border border-border shadow-soft">
+                <Image
+                  src={branch.image}
+                  alt={`Sucursal ${branch.name}, C.A.B.A.`}
+                  fill
+                  sizes="(min-width: 640px) 33vw, 100vw"
+                  className="object-cover"
+                />
               </div>
-            </div>
+              <figcaption className="mt-3 text-center text-sm text-muted-foreground">
+                Sucursal {branch.name}. C.A.B.A.
+              </figcaption>
+            </figure>
           ))}
         </div>
 
@@ -101,12 +98,12 @@ export default async function NosotrosPage() {
           <div>
             <h3 className="text-lg font-semibold text-foreground">¿Buscás un proveedor de confianza?</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              Explorá el catálogo completo y consultanos lo que necesites.
+              Explorá el catálogo completo o llamanos al {siteConfig.contact.phone}.
             </p>
           </div>
           <Link
             href="/"
-            className="inline-flex shrink-0 items-center gap-2 rounded-full bg-gradient-to-r from-primary to-[hsl(var(--aurora-2))] px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-soft transition-transform hover:scale-105"
+            className="inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-soft transition-transform hover:scale-105"
           >
             Ver catálogo
           </Link>

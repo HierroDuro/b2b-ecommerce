@@ -40,7 +40,7 @@ export function Hero({ productCount, showcaseProducts }: HeroProps) {
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
         <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-1 text-xs font-medium text-muted-foreground">
-          Proveedor B2B · Stock actualizado
+          Librería e imprenta · Microcentro, CABA
         </span>
 
         <h1 className="mt-4 text-3xl font-bold leading-[1.15] tracking-tight text-foreground sm:mt-5 sm:text-4xl sm:leading-[1.12] lg:text-5xl">

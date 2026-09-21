@@ -1,32 +1,40 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { RefreshCw, Truck, Headset, MessageCircle, type LucideIcon } from "lucide-react";
+import { ChevronRight, MessageCircle, Phone } from "lucide-react";
 
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
   title: "Servicios",
-  description: "Catálogo actualizado, logística y soporte técnico para empresas.",
+  description:
+    "Venta y copiado de libros contables, certificación de escribanía y fotocopias protocolares en el Microcentro.",
 };
 
-const services: { icon: LucideIcon; title: string; desc: string }[] = [
+const services = [
   {
-    icon: RefreshCw,
-    title: "Catálogo actualizado",
-    desc: "Stock y precios al día, para que compres siempre con la información correcta.",
+    title: "Venta y copiado de libros contables",
+    desc: "Trámite urgente y normal",
+    image: "/servicios/libros-contables.jpg",
   },
   {
-    icon: Truck,
-    title: "Logística propia",
-    desc: "Entregas coordinadas a todo el país, con seguimiento del pedido de punta a punta.",
+    title: "Certificación escribanía",
+    desc: "Fotocopias legalizadas",
+    image: "/servicios/certificacion-escribania.jpg",
   },
   {
-    icon: Headset,
-    title: "Soporte técnico",
-    desc: "Asesoramiento antes y después de la compra, para elegir bien y resolver cualquier duda.",
+    title: "Fotocopias Protocolares",
+    desc: "Hacemos todos los anchos y la mejor resolución",
+    image: "/servicios/fotocopias-protocolares.jpg",
   },
 ];
+
+function inquiryHref(service: string) {
+  const subject = encodeURIComponent(`Consulta: ${service}`);
+  return `mailto:${siteConfig.contact.email}?subject=${subject}`;
+}
 
 export default function ServiciosPage() {
   return (
@@ -38,46 +46,61 @@ export default function ServiciosPage() {
       >
         <div className="max-w-2xl">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/80 px-3 py-1 text-xs font-medium text-muted-foreground shadow-soft">
-            Cómo trabajamos
+            Servicios
           </span>
           <h1 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Servicios pensados para <span className="text-gradient-aurora">tu empresa</span>
+            Copiado, rúbrica y <span className="text-gradient-aurora">certificaciones</span>
           </h1>
-          <p className="mt-4 text-muted-foreground">
-            Catálogo actualizado, logística propia y soporte técnico dedicado para empresas
-            de todos los tamaños.
-          </p>
         </div>
 
-        <div className="mt-12 grid gap-6 sm:grid-cols-3">
-          {services.map(({ icon: Icon, title, desc }) => (
-            <div
+        <div className="mt-12 grid gap-6 lg:grid-cols-2">
+          {services.map(({ title, desc, image }) => (
+            <article
               key={title}
-              className="group rounded-xl border border-border bg-card p-6 shadow-soft transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_18px_40px_-16px_hsl(var(--primary)/0.35)]"
+              className="flex overflow-hidden rounded-xl border border-border bg-card shadow-soft transition-shadow hover:border-primary/30 hover:shadow-card-hover"
             >
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-primary to-[hsl(var(--aurora-2))] text-primary-foreground transition-transform group-hover:scale-110">
-                <Icon className="h-5 w-5" />
-              </span>
-              <h2 className="mt-4 font-semibold text-foreground">{title}</h2>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{desc}</p>
-            </div>
+              <div className="relative w-32 shrink-0 bg-white sm:w-44">
+                <Image src={image} alt={title} fill sizes="176px" className="object-cover" />
+              </div>
+              <div className="flex min-w-0 flex-1 flex-col p-5 sm:p-6">
+                <h2 className="font-semibold leading-snug text-foreground">{title}</h2>
+                <span aria-hidden className="mt-3 h-0.5 w-12 rounded-full bg-primary" />
+                <p className="mt-3 text-sm text-muted-foreground">{desc}</p>
+                <a
+                  href={inquiryHref(title)}
+                  className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-medium text-primary underline-offset-4 hover:underline"
+                >
+                  Consultar
+                  <ChevronRight className="h-4 w-4" />
+                </a>
+              </div>
+            </article>
           ))}
         </div>
 
         <div className="mt-14 flex flex-col items-center gap-4 rounded-2xl border border-border bg-card/60 px-8 py-10 text-center shadow-soft sm:flex-row sm:justify-between sm:text-left">
           <div>
-            <h3 className="text-lg font-semibold text-foreground">¿Tenés dudas sobre algún producto?</h3>
+            <h3 className="text-lg font-semibold text-foreground">¿Necesitás un servicio o un presupuesto?</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              Consultanos por chat directamente desde la ficha de cada producto.
+              Llamanos al {siteConfig.contact.phone} o escribinos a {siteConfig.contact.email}.
             </p>
           </div>
-          <Link
-            href="/"
-            className="inline-flex shrink-0 items-center gap-2 rounded-full bg-gradient-to-r from-primary to-[hsl(var(--aurora-2))] px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-soft transition-transform hover:scale-105"
-          >
-            <MessageCircle className="h-4 w-4" />
-            Ver catálogo
-          </Link>
+          <div className="flex shrink-0 flex-wrap items-center justify-center gap-3">
+            <a
+              href={siteConfig.contact.phoneHref}
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-soft transition-transform hover:scale-105"
+            >
+              <Phone className="h-4 w-4" />
+              Llamar
+            </a>
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary/40 hover:text-primary"
+            >
+              <MessageCircle className="h-4 w-4" />
+              Ver catálogo
+            </Link>
+          </div>
         </div>
       </main>
       <Footer />

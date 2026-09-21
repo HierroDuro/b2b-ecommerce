@@ -46,7 +46,18 @@ export function Footer() {
 
         <div className="space-y-3">
           <h3 className="text-sm font-semibold text-foreground">Contacto</h3>
-          <p className="text-sm text-muted-foreground">ventas@fitotecno.tech</p>
+          <a
+            href={`mailto:${siteConfig.contact.email}`}
+            className="block text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            {siteConfig.contact.email}
+          </a>
+          <a
+            href={siteConfig.contact.phoneHref}
+            className="block text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Tel. {siteConfig.contact.phone}
+          </a>
           <p className="text-sm text-muted-foreground">Lun a Vie, 9 a 18 h</p>
         </div>
       </div>
