@@ -12,7 +12,6 @@ import {
   MessageCircle,
   LogOut,
   Menu,
-  Boxes,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -24,6 +23,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { getAdminUnreadTotal } from "@/actions/chat-actions";
+import { SiteLogo } from "@/components/layout/site-logo";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -106,9 +106,7 @@ export function AdminNav({ username }: { username: string }) {
       {/* Mobile: top bar with a hamburger menu instead of the fixed sidebar. */}
       <div className="flex items-center justify-between border-b border-border bg-card px-4 py-3 md:hidden">
         <div className="flex items-center gap-2">
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground">
-            <Boxes className="h-4 w-4" />
-          </span>
+          <SiteLogo className="h-7 sm:h-7" />
           <span className="text-sm font-semibold text-foreground">Panel de administración</span>
         </div>
         <Dialog open={mobileOpen} onOpenChange={setMobileOpen}>

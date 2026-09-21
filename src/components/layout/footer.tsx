@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Boxes } from "lucide-react";
 
+import { SiteLogo } from "@/components/layout/site-logo";
 import { siteConfig } from "@/config/site";
 
 /**
@@ -15,14 +15,7 @@ export function Footer() {
     <footer className="border-t border-border bg-background">
       <div className="mx-auto grid max-w-[1920px] gap-10 px-6 py-12 sm:grid-cols-2 lg:grid-cols-4 lg:px-10">
         <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground">
-              <Boxes className="h-4 w-4" />
-            </span>
-            <span className="text-lg font-semibold tracking-tight">
-              {siteConfig.shortName.toLowerCase()}
-            </span>
-          </div>
+          <SiteLogo />
           <p className="max-w-xs text-sm text-muted-foreground">{siteConfig.description}</p>
         </div>
 

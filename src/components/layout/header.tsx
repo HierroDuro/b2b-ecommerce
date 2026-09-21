@@ -2,12 +2,13 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ChevronDown, Boxes } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { SearchBar } from "@/components/products/search-bar";
 import { AccountMenu } from "@/components/layout/account-menu";
+import { SiteLogo } from "@/components/layout/site-logo";
 import { cn } from "@/lib/utils";
 
 /**
@@ -43,13 +44,8 @@ export function Header() {
         </nav>
 
         {/* Center zone: logo */}
-        <Link href="/" className="flex items-center gap-2 justify-self-center">
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground">
-            <Boxes className="h-4 w-4" />
-          </span>
-          <span className="text-lg font-semibold tracking-tight text-foreground">
-            {siteConfig.shortName.toLowerCase()}
-          </span>
+        <Link href="/" aria-label="Inicio" className="justify-self-center">
+          <SiteLogo priority />
         </Link>
 
         {/* Right zone: search + actions */}
