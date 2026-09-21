@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, MailCheck } from "lucide-react";
+import { KeyRound, Loader2, MailCheck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +22,8 @@ export function ForgotPasswordForm() {
   const [sentTo, setSentTo] = React.useState<{ email: string; masked: string } | null>(null);
   const [secondsLeft, setSecondsLeft] = React.useState(0);
   const [resending, setResending] = React.useState(false);
+  // Set only when no mailbox is configured: the link is shown instead of emailed.
+  const [resetUrl, setResetUrl] = React.useState<string | null>(null);
 
   const {
     register,
@@ -46,6 +48,11 @@ export function ForgotPasswordForm() {
       return false;
     }
 
+    if (result.resetUrl) {
+      setResetUrl(result.resetUrl);
+      return true;
+    }
+
     setSentTo({ email, masked: result.maskedEmail ?? email });
     setSecondsLeft(RESEND_SECONDS);
     return true;
@@ -61,6 +68,36 @@ export function ForgotPasswordForm() {
     await send(sentTo.email);
     setResending(false);
   };
+
+  if (resetUrl) {
+    return (
+      <div className="space-y-5 text-center">
+        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <KeyRound className="h-7 w-7" />
+        </span>
+        <div className="space-y-2">
+          <h2 className="text-lg font-semibold text-foreground">Tu enlace está listo</h2>
+          <p className="text-sm text-muted-foreground">
+            Tocá el botón para elegir una contraseña nueva. El enlace vale 1 hora y se puede usar
+            una sola vez.
+          </p>
+        </div>
+        <a
+          href={resetUrl}
+          className="inline-flex h-10 w-full items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+        >
+          Elegir nueva contraseña
+        </a>
+        <button
+          type="button"
+          onClick={() => setResetUrl(null)}
+          className="w-full text-sm text-primary hover:underline"
+        >
+          Usar otro email
+        </button>
+      </div>
+    );
+  }
 
   if (sentTo) {
     return (
@@ -117,8 +154,7 @@ export function ForgotPasswordForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       <p className="text-sm text-muted-foreground">
-        Ingresá el email de tu cuenta y te enviaremos un correo con un enlace para elegir una
-        contraseña nueva.
+        Ingresá el email de tu cuenta y te ayudamos a elegir una contraseña nueva.
       </p>
       <div className="space-y-1.5">
         <Label htmlFor="forgot-email">Email</Label>
@@ -133,7 +169,7 @@ export function ForgotPasswordForm() {
       )}
 
       <Button type="submit" disabled={isSubmitting} className="w-full">
-        {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enviar correo"}
+        {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Continuar"}
       </Button>
     </form>
   );
