@@ -49,19 +49,33 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
           on white, so this stays white in dark mode too instead of clashing
           with the photo's own baked-in background. */}
       <Link href={href} className="relative block aspect-square w-full overflow-hidden bg-white">
-        <div className="absolute left-3 top-3 z-10 flex flex-col items-start gap-1.5">
+        {/* Small and tight on phone/tablet (<lg) — three stacked badges at
+            full desktop size were eating enough of the photo's height to
+            hide the product itself on a narrow card. They grow back to
+            their normal size from `lg` up, where the card has room to
+            spare (this matches the grid's own breakpoints elsewhere). */}
+        <div className="absolute left-1.5 top-1.5 z-10 flex flex-col items-start gap-1 lg:left-3 lg:top-3 lg:gap-1.5">
           {product.isFeatured && (
-            <Badge variant="highlight" className="gap-1 px-2.5 py-1 shadow-soft">
-              <Star className="h-3 w-3 fill-current" />
+            <Badge
+              variant="highlight"
+              className="gap-0.5 px-1.5 py-0.5 text-[9px] shadow-soft lg:gap-1 lg:px-2.5 lg:py-1 lg:text-xs"
+            >
+              <Star className="h-2 w-2 fill-current lg:h-3 lg:w-3" />
               Destacado
             </Badge>
           )}
           {product.isOnSale && (
-            <Badge variant="destructive" className="px-2.5 py-1 shadow-soft">
+            <Badge
+              variant="destructive"
+              className="px-1.5 py-0.5 text-[9px] shadow-soft lg:px-2.5 lg:py-1 lg:text-xs"
+            >
               Oferta
             </Badge>
           )}
-          <Badge variant={outOfStock ? "danger" : "success"} className="px-2.5 py-1 shadow-soft">
+          <Badge
+            variant={outOfStock ? "danger" : "success"}
+            className="px-1.5 py-0.5 text-[9px] shadow-soft lg:px-2.5 lg:py-1 lg:text-xs"
+          >
             {outOfStock ? "Agotado" : "Disponible"}
           </Badge>
         </div>
