@@ -119,6 +119,9 @@ export function ProductImageGallery({ images, alt }: ProductImageGalleryProps) {
   const showNext = () => setActiveIndex((i) => (i + 1) % images.length);
 
   const onTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    // Belt-and-suspenders alongside the viewport guard in handleMouseMove:
+    // a real touch means this definitely isn't the hover-zoom lens's turn.
+    setIsZooming(false);
     const t = e.touches[0];
     if (!t) return;
     touchRef.current = { x: t.clientX, y: t.clientY, swiped: false };
@@ -184,6 +187,18 @@ export function ProductImageGallery({ images, alt }: ProductImageGalleryProps) {
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    // The hover-zoom lens is a desktop-only affordance (see the `lg:`
+    // cursor/panel classes below) — but phone/tablet browsers still fire
+    // one synthetic mousemove right after a tap, for compatibility with
+    // sites that only listen for mouse events. Without this guard, tapping
+    // the photo to open the lightbox would leave the lens square drawn at
+    // the tap position underneath it, still showing once the lightbox (or
+    // a "back" out of it) closed.
+    if (window.innerWidth < 1024) {
+      setIsZooming(false);
+      return;
+    }
+
     const container = containerRef.current;
     const wrapper = wrapperRef.current;
     if (!container || !wrapper) return;
