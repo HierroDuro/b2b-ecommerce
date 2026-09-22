@@ -53,14 +53,14 @@ async function getOnSaleProducts(): Promise<ProductDTO[]> {
 
 /** Feeds the hero's right-side product showcase — real catalog products
  * (not a stock photo) as proof there's an actual, priced range behind the
- * pitch. Always the 3 cheapest active products, so it updates itself the
+ * pitch. Always the 9 cheapest active products, so it updates itself the
  * moment a lower-priced product is added or a price drops — no manual
  * curation needed. */
 async function getShowcaseProducts(): Promise<ProductDTO[]> {
   const products = await prisma.product.findMany({
     where: { isActive: true },
     orderBy: { price: "asc" },
-    take: 3,
+    take: 9,
     include: {
       category: { select: { id: true, name: true, slug: true } },
       images: { orderBy: { order: "asc" } },

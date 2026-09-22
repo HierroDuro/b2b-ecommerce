@@ -29,10 +29,10 @@ const valueProps: { icon: LucideIcon; label: string }[] = [
  * brand gradient) per the corporate-B2B direction.
  */
 export function Hero({ productCount, showcaseProducts }: HeroProps) {
-  const showcase = showcaseProducts.slice(0, 3);
+  const showcase = showcaseProducts.slice(0, 9);
 
   return (
-    <section className="grid gap-6 py-5 sm:py-8 lg:grid-cols-2 lg:items-center lg:gap-16 lg:py-14">
+    <section className="grid gap-6 py-5 sm:py-8 lg:grid-cols-[1fr_1.35fr] lg:items-center lg:gap-16 lg:py-14">
       <motion.div
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
@@ -72,10 +72,11 @@ export function Hero({ productCount, showcaseProducts }: HeroProps) {
           ))}
         </dl>
 
-        {/* Phone/tablet get the same "cheapest 3, real and clickable"
-            proof as the desktop panel, just as a plain 3-up row instead
-            of a floating collage — that layout only works with the extra
-            width of the two-column desktop grid. */}
+        {/* Phone/tablet get the same "9 cheapest, real and clickable" proof
+            as the desktop panel, just as a plain 3x3 grid (3 columns wrap
+            the 9 items into 3 rows on their own) instead of the desktop's
+            bigger showcase panel — that one needs the extra width of the
+            two-column desktop grid to be worth the space. */}
         <div className="mt-6 lg:hidden">
           <div className="grid grid-cols-3 gap-2 sm:gap-3">
             {showcase.map((product) => (
@@ -105,16 +106,19 @@ export function Hero({ productCount, showcaseProducts }: HeroProps) {
         </div>
       </motion.div>
 
-      {/* The floating product-collage panel needs the extra width of the
-          two-column desktop grid to breathe — phone and tablet get the
-          plain 3-up row above instead (rendered inline with the text). */}
+      {/* Desktop showcase panel: a 3x3 grid of the 9 cheapest products,
+          bigger than the old 3-card floating collage both in item count
+          and in the space it's given (a wider column + a wider cap here).
+          Phone/tablet get the plain 3x3 row above instead (rendered inline
+          with the text) — this panel needs the extra width of the
+          two-column desktop grid to fit 9 cards without feeling cramped. */}
       <motion.div
         initial={{ opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
-        className="relative mx-auto hidden w-full max-w-md lg:block"
+        className="relative mx-auto hidden w-full max-w-2xl lg:block"
       >
-        <div className="relative aspect-[4/4.4] w-full overflow-hidden rounded-3xl bg-secondary/70">
+        <div className="relative overflow-hidden rounded-3xl bg-secondary/70 p-5">
           {/* Faint dot-grid texture — the only decorative touch, confined to
               this one panel instead of washing over the whole page. */}
           <div
@@ -126,27 +130,16 @@ export function Hero({ productCount, showcaseProducts }: HeroProps) {
             }}
           />
 
-          {showcase[0] && (
-            <ShowcaseCard
-              product={showcase[0]}
-              className="absolute left-6 top-8 w-44 -rotate-3 sm:left-8 sm:w-48"
-            />
-          )}
-          {showcase[1] && (
-            <ShowcaseCard
-              product={showcase[1]}
-              className="absolute right-4 top-24 w-40 rotate-6 sm:right-6 sm:top-28 sm:w-44"
-            />
-          )}
-          {showcase[2] && (
-            <ShowcaseCard
-              product={showcase[2]}
-              className="absolute bottom-8 left-1/2 w-44 -translate-x-1/2 rotate-2 sm:w-48"
-            />
-          )}
+          <div className="relative flex justify-end">
+            <span className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-soft">
+              +{productCount} productos
+            </span>
+          </div>
 
-          <div className="absolute right-4 top-4 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-soft">
-            +{productCount} productos
+          <div className="relative mt-4 grid grid-cols-3 gap-3">
+            {showcase.map((product) => (
+              <ShowcaseCard key={product.id} product={product} />
+            ))}
           </div>
         </div>
       </motion.div>
@@ -154,14 +147,14 @@ export function Hero({ productCount, showcaseProducts }: HeroProps) {
   );
 }
 
-function ShowcaseCard({ product, className }: { product: ProductDTO; className: string }) {
+function ShowcaseCard({ product }: { product: ProductDTO }) {
   return (
     <Link
       href={`/productos/${product.id}`}
-      className={`block overflow-hidden rounded-xl border border-border bg-card p-3 shadow-card transition-transform hover:z-10 hover:rotate-0 hover:scale-105 ${className}`}
+      className="block overflow-hidden rounded-xl border border-border bg-card p-2.5 shadow-card transition-transform hover:z-10 hover:scale-105"
     >
       <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-white">
-        <Image src={product.imageUrl} alt={product.name} fill sizes="200px" className="object-contain p-3" />
+        <Image src={product.imageUrl} alt={product.name} fill sizes="180px" className="object-contain p-2.5" />
       </div>
       <p className="mt-2 line-clamp-1 text-xs font-semibold text-foreground">{product.name}</p>
       <p className="text-sm font-bold text-primary">{formatCurrency(product.price)}</p>
