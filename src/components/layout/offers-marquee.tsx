@@ -16,17 +16,20 @@ const EDGE_ZONE = 0.18; // fraction of the width (each side) that reacts to the 
 /** Continuously scrolling strip of on-sale products. It is a real
  * horizontally-scrollable container driven by a requestAnimationFrame loop,
  * so every interaction shares one mechanism:
- *  - idle: drifts steadily to the right (endless — the list is rendered three
- *    times and the position is wrapped by exactly one copy's width);
- *  - mouse: near the right edge it speeds up toward the right, near the left
- *    edge it runs back toward the left; it eases back to the normal drift as
- *    soon as the pointer leaves the edge;
- *  - touch: the finger scrolls it natively; auto-scroll pauses while touching
- *    (and during the swipe's momentum) and then resumes by itself. */
+ *  - idle (mouse not over it at all): drifts steadily to the right
+ *    (endless — the list is rendered three times and the position is
+ *    wrapped by exactly one copy's width);
+ *  - mouse near either edge: speeds up in that direction — right edge runs
+ *    right, left edge runs left;
+ *  - mouse over the middle (not near an edge): freezes in place, so
+ *    hovering to read a card actually holds still;
+ *  - touch: the finger scrolls it natively; auto-scroll pauses while
+ *    touching (and during the swipe's momentum) and then resumes on its
+ *    own once the finger lifts. */
 export function OffersMarquee({ offers }: { offers: ProductDTO[] }) {
   const scrollerRef = React.useRef<HTMLDivElement>(null);
   const trackRef = React.useRef<HTMLDivElement>(null);
-  const hoverRef = React.useRef({ dir: 0, strength: 0 });
+  const hoverRef = React.useRef({ dir: 0 as -1 | 0 | 1, strength: 0, hovering: false });
   const [zone, setZone] = React.useState<-1 | 0 | 1>(0);
 
   // Repeat the list until one copy is wide enough for any screen, then
@@ -91,8 +94,11 @@ export function OffersMarquee({ offers }: { offers: ProductDTO[] }) {
           pos = el.scrollLeft;
           velocity = idleSpeed;
         } else {
-          const { dir, strength } = hoverRef.current;
-          const target = dir === 0 ? idleSpeed : dir * (BASE_SPEED + strength * EDGE_BOOST);
+          const { dir, strength, hovering } = hoverRef.current;
+          // Not hovering at all: keep drifting. Hovering the middle: hold
+          // still. Hovering an edge: run toward that side, faster the
+          // closer the pointer is to the very edge.
+          const target = !hovering ? idleSpeed : dir === 0 ? 0 : dir * (BASE_SPEED + strength * EDGE_BOOST);
           velocity += (target - velocity) * Math.min(1, dt * 6);
           pos += velocity * dt;
         }
@@ -131,8 +137,13 @@ export function OffersMarquee({ offers }: { offers: ProductDTO[] }) {
   }, [base]);
 
   const setHover = (dir: -1 | 0 | 1, strength: number) => {
-    hoverRef.current = { dir, strength };
+    hoverRef.current = { dir, strength, hovering: true };
     setZone((prev) => (prev === dir ? prev : dir));
+  };
+
+  const clearHover = () => {
+    hoverRef.current = { dir: 0, strength: 0, hovering: false };
+    setZone((prev) => (prev === 0 ? prev : 0));
   };
 
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -153,7 +164,7 @@ export function OffersMarquee({ offers }: { offers: ProductDTO[] }) {
         <Tag className="h-4 w-4 text-primary" />
         Ofertas de la semana
       </h2>
-      <div className="relative" onPointerMove={onPointerMove} onPointerLeave={() => setHover(0, 0)}>
+      <div className="relative" onPointerMove={onPointerMove} onPointerLeave={clearHover}>
         <div
           ref={scrollerRef}
           className="w-full overflow-x-auto overscroll-x-contain [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
