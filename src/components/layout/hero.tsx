@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Boxes, Tag, Truck, MessageCircle, type LucideIcon } from "lucide-react";
 
-import { cn, formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 import type { ProductDTO } from "@/types/product";
 
 interface HeroProps {
@@ -105,18 +105,19 @@ export function Hero({ showcaseProducts }: HeroProps) {
         </div>
       </motion.div>
 
-      {/* Desktop showcase panel: all 9 cheapest products in a single
-          horizontal row, no scrolling needed — the panel fills the whole
-          right column (no width cap) and the 9 cards evenly share that
-          width (flex-1), instead of a fixed card width that only fit 4 at
-          a time. Phone/tablet get the plain 3x3 row above instead
-          (rendered inline with the text) — this panel needs the extra
-          width of the two-column desktop grid to fit 9 across. */}
+      {/* Desktop showcase panel: a 3x3 grid of the 9 cheapest products,
+          big enough to actually fill the right column's height instead of
+          floating as a small, mostly-empty box next to the text — a single
+          horizontal row forced the cards down to icon size to fit all 9
+          without scrolling, which read as broken/too small. Phone/tablet
+          get the plain 3x3 row above instead (rendered inline with the
+          text) — this panel needs the extra width of the two-column
+          desktop grid to fit 9 cards without feeling cramped. */}
       <motion.div
         initial={{ opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
-        className="relative mx-auto hidden w-full min-w-0 lg:block"
+        className="relative mx-auto hidden w-full max-w-2xl min-w-0 lg:block"
       >
         <div className="relative overflow-hidden rounded-3xl bg-secondary/70 p-5">
           {/* Faint dot-grid texture — the only decorative touch, confined to
@@ -134,9 +135,9 @@ export function Hero({ showcaseProducts }: HeroProps) {
             Lo más barato de la tienda
           </p>
 
-          <div className="relative flex gap-2">
+          <div className="relative grid grid-cols-3 gap-3">
             {showcase.map((product) => (
-              <ShowcaseCard key={product.id} product={product} className="min-w-0 flex-1" />
+              <ShowcaseCard key={product.id} product={product} />
             ))}
           </div>
         </div>
@@ -145,20 +146,17 @@ export function Hero({ showcaseProducts }: HeroProps) {
   );
 }
 
-function ShowcaseCard({ product, className }: { product: ProductDTO; className?: string }) {
+function ShowcaseCard({ product }: { product: ProductDTO }) {
   return (
     <Link
       href={`/productos/${product.id}`}
-      className={cn(
-        "block overflow-hidden rounded-xl border border-border bg-card p-1.5 shadow-card transition-transform hover:z-10 hover:scale-105",
-        className,
-      )}
+      className="block overflow-hidden rounded-xl border border-border bg-card p-2.5 shadow-card transition-transform hover:z-10 hover:scale-105"
     >
       <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-white">
-        <Image src={product.imageUrl} alt={product.name} fill sizes="120px" className="object-contain p-1.5" />
+        <Image src={product.imageUrl} alt={product.name} fill sizes="180px" className="object-contain p-2.5" />
       </div>
-      <p className="mt-1.5 line-clamp-1 text-[10px] font-semibold text-foreground">{product.name}</p>
-      <p className="text-[11px] font-bold text-primary">{formatCurrency(product.price)}</p>
+      <p className="mt-2 line-clamp-1 text-xs font-semibold text-foreground">{product.name}</p>
+      <p className="text-sm font-bold text-primary">{formatCurrency(product.price)}</p>
     </Link>
   );
 }
