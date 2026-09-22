@@ -107,6 +107,41 @@ export function ProductImageGallery({ images, alt }: ProductImageGalleryProps) {
     touchRef.current = null;
   };
 
+  // Same swipe gesture, but for the fullscreen lightbox — kept as its own
+  // ref/handlers (rather than reusing the ones above) because this view
+  // also supports native pinch-zoom-and-pan, which a swipe must not
+  // fight with: a second finger, or an already-zoomed-in image, means
+  // "let the browser handle this pan/zoom", not "change photo".
+  const lightboxTouchRef = React.useRef<{ x: number; y: number; swiped: boolean } | null>(null);
+
+  const isPinchZoomedIn = () => (window.visualViewport?.scale ?? 1) > 1.05;
+
+  const onLightboxTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    const t = e.touches[0];
+    if (!t || e.touches.length > 1 || isPinchZoomedIn()) {
+      lightboxTouchRef.current = null;
+      return;
+    }
+    lightboxTouchRef.current = { x: t.clientX, y: t.clientY, swiped: false };
+  };
+
+  const onLightboxTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    const start = lightboxTouchRef.current;
+    const t = e.touches[0];
+    if (!start || !t || e.touches.length > 1 || images.length <= 1) return;
+    const dx = t.clientX - start.x;
+    const dy = t.clientY - start.y;
+    if (!start.swiped && Math.abs(dx) > SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy)) {
+      start.swiped = true;
+      if (dx < 0) showNext();
+      else showPrev();
+    }
+  };
+
+  const onLightboxTouchEnd = () => {
+    lightboxTouchRef.current = null;
+  };
+
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const container = containerRef.current;
     const wrapper = wrapperRef.current;
@@ -307,16 +342,20 @@ export function ProductImageGallery({ images, alt }: ProductImageGalleryProps) {
             <X className="h-6 w-6" />
           </button>
 
+          {/* Arrows — desktop only, same as the main photo. Phone/tablet
+              swipe left/right on the image instead (see the touch handlers
+              on the scrollable div below), which also has to stay clear
+              for the native pinch-zoom/pan gesture this view supports. */}
           {images.length > 1 && (
             <>
               <button
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setActiveIndex((i) => (i - 1 + images.length) % images.length);
+                  showPrev();
                 }}
                 aria-label="Imagen anterior"
-                className="absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
+                className="absolute left-2 top-1/2 z-10 hidden -translate-y-1/2 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20 lg:block"
               >
                 <ChevronLeft className="h-6 w-6" />
               </button>
@@ -324,10 +363,10 @@ export function ProductImageGallery({ images, alt }: ProductImageGalleryProps) {
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setActiveIndex((i) => (i + 1) % images.length);
+                  showNext();
                 }}
                 aria-label="Imagen siguiente"
-                className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
+                className="absolute right-2 top-1/2 z-10 hidden -translate-y-1/2 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20 lg:block"
               >
                 <ChevronRight className="h-6 w-6" />
               </button>
@@ -336,10 +375,16 @@ export function ProductImageGallery({ images, alt }: ProductImageGalleryProps) {
 
           {/* Scrollable, not `overflow-hidden` — that's what lets the
               browser's native pinch-zoom / pan actually work once zoomed
-              in, same as a photo viewer. No custom gesture code needed. */}
+              in, same as a photo viewer. Swipe-to-change-photo (phone/
+              tablet) piggybacks on the same div, but backs off the moment
+              there's a second finger or the photo is already pinch-zoomed
+              in, so it never fights that native gesture. */}
           <div
             className="h-full w-full overflow-auto"
             onClick={(e) => e.stopPropagation()}
+            onTouchStart={onLightboxTouchStart}
+            onTouchMove={onLightboxTouchMove}
+            onTouchEnd={onLightboxTouchEnd}
           >
             <div className="flex min-h-full items-center justify-center p-6">
               {/* Plain <img>, not next/image — the lightbox needs the
