@@ -49,15 +49,26 @@ export function ProductImageGallery({ images, alt }: ProductImageGalleryProps) {
   const [naturalSize, setNaturalSize] = React.useState<{ w: number; h: number } | null>(null);
   const [lightboxOpen, setLightboxOpen] = React.useState(false);
 
-  // Opening the lightbox pushes a throwaway history entry (same URL, just
-  // a marker in `state`) instead of only flipping React state. That's what
-  // lets the phone's own back button close the lightbox and land back on
-  // this product page — without it, "back" skips the lightbox entirely and
-  // goes wherever the browser history would otherwise send it (usually the
-  // catalog), since opening the lightbox never looked like navigation to
-  // begin with.
+  // Opening the lightbox pushes a throwaway history entry instead of only
+  // flipping React state. That's what lets the phone's own back button
+  // close the lightbox and land back on this product page — without it,
+  // "back" skips the lightbox entirely and goes wherever the browser
+  // history would otherwise send it (usually the catalog), since opening
+  // the lightbox never looked like navigation to begin with.
+  //
+  // The entry adds a "#foto" hash rather than just a `state` marker on the
+  // same URL: some mobile contexts (Chrome Custom Tabs opened from a
+  // shared link, certain in-app browsers, Android's predictive-back) treat
+  // a same-URL, state-only history entry as trivial and let the hardware
+  // back button skip straight past it. An actual URL change is what every
+  // one of those back-button implementations reliably treats as a real
+  // step to stop at.
   const openLightbox = () => {
-    window.history.pushState({ galleryLightbox: true }, "");
+    window.history.pushState(
+      { galleryLightbox: true },
+      "",
+      `${window.location.pathname}${window.location.search}#foto`,
+    );
     setLightboxOpen(true);
   };
 
