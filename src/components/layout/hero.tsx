@@ -5,7 +5,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Boxes, Tag, Truck, MessageCircle, type LucideIcon } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils";
 import type { ProductDTO } from "@/types/product";
 
@@ -167,83 +166,5 @@ function ShowcaseCard({ product, className }: { product: ProductDTO; className: 
       <p className="mt-2 line-clamp-1 text-xs font-semibold text-foreground">{product.name}</p>
       <p className="text-sm font-bold text-primary">{formatCurrency(product.price)}</p>
     </Link>
-  );
-}
-
-/** Auto-scrolling horizontal strip of on-sale products — pure CSS
- * animation (no JS timer), the item list is rendered twice back-to-back
- * and the track scrolls exactly half its width, so the loop is seamless.
- * Hover pauses it (CSS-only) so it's actually readable/clickable. Rendered
- * as its own section below the hero fold, not inside it, so the main
- * pitch (headline + CTA) isn't competing with a busy scrolling strip. */
-export function OffersMarquee({ offers }: { offers: ProductDTO[] }) {
-  if (offers.length === 0) return null;
-
-  const track = [...offers, ...offers];
-  const durationSeconds = Math.max(offers.length * 5, 20);
-
-  return (
-    <div className="mb-10">
-      <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground">
-        <Tag className="h-4 w-4 text-primary" />
-        Ofertas de la semana
-      </h2>
-      <div className="group w-full max-w-none overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)]">
-        <div
-          className="flex w-max items-stretch gap-3 [animation-play-state:running] group-hover:[animation-play-state:paused] lg:gap-5"
-          style={{
-            // Longhand properties on purpose: the `animation` shorthand
-            // implicitly resets animation-play-state to "running" and, set
-            // inline, would out-specificity the group-hover class above —
-            // leaving play-state out of this inline style is what lets the
-            // hover-to-pause utility actually take effect.
-            animationName: "marquee",
-            animationDuration: `${durationSeconds}s`,
-            animationTimingFunction: "linear",
-            animationIterationCount: "infinite",
-          }}
-        >
-          {track.map((product, i) => (
-            <Link
-              key={`${product.id}-${i}`}
-              href={`/productos/${product.id}`}
-              className="relative flex w-28 shrink-0 flex-col overflow-hidden rounded-xl border border-border bg-card text-left shadow-soft transition-shadow hover:border-primary/30 hover:shadow-card-hover sm:w-36 lg:w-56 xl:w-64"
-            >
-              <Badge
-                variant="destructive"
-                className="absolute left-1.5 top-1.5 z-10 gap-1 px-1.5 py-0 text-[9px] sm:left-2.5 sm:top-2.5 sm:px-2 sm:py-0.5 sm:text-[10px]"
-              >
-                <Tag className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                Oferta
-              </Badge>
-              <div className="relative aspect-square w-full bg-white">
-                <Image
-                  src={product.imageUrl}
-                  alt={product.name}
-                  fill
-                  sizes="256px"
-                  className="object-contain p-2 sm:p-4 lg:p-6"
-                />
-              </div>
-              <div className="flex flex-1 flex-col gap-0.5 p-2 sm:gap-1 sm:p-2.5 lg:p-3.5">
-                <p className="line-clamp-2 text-[11px] font-semibold leading-snug text-foreground sm:text-xs lg:text-sm">
-                  {product.name}
-                </p>
-                <div className="mt-auto flex flex-wrap items-baseline gap-1 pt-1 sm:gap-2">
-                  {product.originalPrice && (
-                    <span className="text-[10px] text-muted-foreground line-through sm:text-xs">
-                      {formatCurrency(product.originalPrice)}
-                    </span>
-                  )}
-                  <span className="text-xs font-bold text-foreground sm:text-sm lg:text-base">
-                    {formatCurrency(product.price)}
-                  </span>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </div>
   );
 }

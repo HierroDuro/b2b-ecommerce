@@ -1,6 +1,7 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { Hero, OffersMarquee } from "@/components/layout/hero";
+import { Hero } from "@/components/layout/hero";
+import { OffersMarquee } from "@/components/layout/offers-marquee";
 import { Storefront } from "@/components/products/storefront";
 import { HideWhileSearching } from "@/components/layout/hide-while-searching";
 import { SearchBar } from "@/components/products/search-bar";
