@@ -2,6 +2,7 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Hero, OffersMarquee } from "@/components/layout/hero";
 import { Storefront } from "@/components/products/storefront";
+import { HideWhileSearching } from "@/components/layout/hide-while-searching";
 import { SearchBar } from "@/components/products/search-bar";
 import { prisma } from "@/lib/prisma";
 import type { CategoryDTO, ProductDTO } from "@/types/product";
@@ -95,10 +96,14 @@ export default async function HomePage() {
           <SearchBar />
         </div>
 
-        <Hero productCount={productCount} showcaseProducts={showcaseProducts} />
+        <HideWhileSearching>
+          <Hero productCount={productCount} showcaseProducts={showcaseProducts} />
+        </HideWhileSearching>
 
         <div id="catalogo" className="scroll-mt-[calc(var(--header-h)+16px)]">
-          <OffersMarquee offers={onSaleProducts} />
+          <HideWhileSearching>
+            <OffersMarquee offers={onSaleProducts} />
+          </HideWhileSearching>
 
           <Storefront categories={categories} />
         </div>
