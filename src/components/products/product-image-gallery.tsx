@@ -17,6 +17,9 @@ const ZOOM_FACTOR = 2.5;
 const RESULT_WIDTH_RATIO = 1.35;
 /** Lens outline size on the source image, in pixels. */
 const LENS_SIZE = 96;
+/** Minimum horizontal drag, in pixels, before a touch counts as a swipe
+ * (rather than a tap-to-zoom or an incidental wobble). */
+const SWIPE_THRESHOLD = 40;
 
 interface ZoomState {
   lensLeft: number;
@@ -65,8 +68,44 @@ export function ProductImageGallery({ images, alt }: ProductImageGalleryProps) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const wrapperRef = React.useRef<HTMLDivElement>(null);
   const imgElRef = React.useRef<HTMLImageElement>(null);
+  // Touch-swipe bookkeeping — a ref, not state, since it only drives what
+  // touchend/click do next and never needs to trigger a re-render itself.
+  const touchRef = React.useRef<{ x: number; y: number; swiped: boolean } | null>(null);
 
   const activeImage = images[activeIndex] ?? images[0] ?? "";
+
+  const showPrev = () => setActiveIndex((i) => (i - 1 + images.length) % images.length);
+  const showNext = () => setActiveIndex((i) => (i + 1) % images.length);
+
+  const onTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    const t = e.touches[0];
+    if (!t) return;
+    touchRef.current = { x: t.clientX, y: t.clientY, swiped: false };
+  };
+
+  const onTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    const start = touchRef.current;
+    const t = e.touches[0];
+    if (!start || !t || images.length <= 1) return;
+    const dx = t.clientX - start.x;
+    const dy = t.clientY - start.y;
+    // Only claim the gesture once it's clearly more horizontal than
+    // vertical — otherwise a vertical scroll through the page would get
+    // eaten the moment it happens to start over the photo.
+    if (!start.swiped && Math.abs(dx) > SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy)) {
+      start.swiped = true;
+      if (dx < 0) showNext();
+      else showPrev();
+    }
+  };
+
+  const onTouchEnd = () => {
+    // No need to guard the container's onClick here: a browser only
+    // synthesizes a tap's click event when the touch barely moved, well
+    // under our 40px swipe threshold, so a real swipe never also opens
+    // the lightbox.
+    touchRef.current = null;
+  };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const container = containerRef.current;
@@ -171,7 +210,11 @@ export function ProductImageGallery({ images, alt }: ProductImageGalleryProps) {
           onMouseMove={handleMouseMove}
           onMouseLeave={() => setIsZooming(false)}
           onClick={() => setLightboxOpen(true)}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
           className="relative aspect-square w-full cursor-zoom-in overflow-hidden rounded-xl border border-border bg-white lg:cursor-crosshair"
+          style={{ touchAction: "pan-y" }}
         >
           <Image
             ref={imgElRef}
@@ -201,10 +244,10 @@ export function ProductImageGallery({ images, alt }: ProductImageGalleryProps) {
             Ampliar
           </span>
 
-          {/* Prev/next arrows on the main photo itself — the thumbnail
-              rail (or the lightbox) works fine on desktop, but on phone/
-              tablet, where the rail sits to the side of a full-width
-              image, these are the quicker way to flip through photos. */}
+          {/* Prev/next arrows on the main photo — desktop only. Phone/
+              tablet swipe the photo left/right instead (see the touch
+              handlers above); arrows there would just sit in the way of
+              that gesture and duplicate it. */}
           {images.length > 1 && (
             <>
               <button
@@ -212,10 +255,10 @@ export function ProductImageGallery({ images, alt }: ProductImageGalleryProps) {
                 data-gallery-nav
                 onClick={(e) => {
                   e.stopPropagation();
-                  setActiveIndex((i) => (i - 1 + images.length) % images.length);
+                  showPrev();
                 }}
                 aria-label={`Imagen anterior de ${alt}`}
-                className="absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-background/90 p-1.5 text-foreground shadow-soft transition-colors hover:bg-background"
+                className="absolute left-2 top-1/2 z-10 hidden -translate-y-1/2 rounded-full bg-background/90 p-1.5 text-foreground shadow-soft transition-colors hover:bg-background lg:block"
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
@@ -224,10 +267,10 @@ export function ProductImageGallery({ images, alt }: ProductImageGalleryProps) {
                 data-gallery-nav
                 onClick={(e) => {
                   e.stopPropagation();
-                  setActiveIndex((i) => (i + 1) % images.length);
+                  showNext();
                 }}
                 aria-label={`Imagen siguiente de ${alt}`}
-                className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-background/90 p-1.5 text-foreground shadow-soft transition-colors hover:bg-background"
+                className="absolute right-2 top-1/2 z-10 hidden -translate-y-1/2 rounded-full bg-background/90 p-1.5 text-foreground shadow-soft transition-colors hover:bg-background lg:block"
               >
                 <ChevronRight className="h-5 w-5" />
               </button>
