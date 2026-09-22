@@ -49,18 +49,48 @@ export function ProductImageGallery({ images, alt }: ProductImageGalleryProps) {
   const [naturalSize, setNaturalSize] = React.useState<{ w: number; h: number } | null>(null);
   const [lightboxOpen, setLightboxOpen] = React.useState(false);
 
-  // Close the lightbox on Escape, and lock page scroll behind it while open
-  // (the lightbox itself stays scrollable/pinch-zoomable — see its own div).
+  // Opening the lightbox pushes a throwaway history entry (same URL, just
+  // a marker in `state`) instead of only flipping React state. That's what
+  // lets the phone's own back button close the lightbox and land back on
+  // this product page — without it, "back" skips the lightbox entirely and
+  // goes wherever the browser history would otherwise send it (usually the
+  // catalog), since opening the lightbox never looked like navigation to
+  // begin with.
+  const openLightbox = () => {
+    window.history.pushState({ galleryLightbox: true }, "");
+    setLightboxOpen(true);
+  };
+
+  // Closing it the "normal" way (X button, tapping the backdrop, Escape)
+  // goes back through that same history entry rather than just setting
+  // state — so the entry doesn't linger, and both close paths (this one,
+  // and the popstate handler below reacting to the hardware back button)
+  // end up doing the exact same thing.
+  const closeLightbox = () => {
+    if (window.history.state?.galleryLightbox) {
+      window.history.back();
+    } else {
+      setLightboxOpen(false);
+    }
+  };
+
+  // Close the lightbox on Escape or on the back button (via the popstate
+  // this pops our pushed history entry into), and lock page scroll behind
+  // it while open (the lightbox itself stays scrollable/pinch-zoomable —
+  // see its own div).
   React.useEffect(() => {
     if (!lightboxOpen) return;
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setLightboxOpen(false);
+      if (e.key === "Escape") closeLightbox();
     };
+    const onPopState = () => setLightboxOpen(false);
     document.addEventListener("keydown", onKeyDown);
+    window.addEventListener("popstate", onPopState);
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("popstate", onPopState);
       document.body.style.overflow = previousOverflow;
     };
   }, [lightboxOpen]);
@@ -244,7 +274,7 @@ export function ProductImageGallery({ images, alt }: ProductImageGalleryProps) {
           ref={containerRef}
           onMouseMove={handleMouseMove}
           onMouseLeave={() => setIsZooming(false)}
-          onClick={() => setLightboxOpen(true)}
+          onClick={openLightbox}
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
@@ -331,11 +361,20 @@ export function ProductImageGallery({ images, alt }: ProductImageGalleryProps) {
       {lightboxOpen && (
         <div
           className="fixed inset-0 z-50 bg-black/95"
-          onClick={() => setLightboxOpen(false)}
+          onClick={closeLightbox}
         >
           <button
             type="button"
-            onClick={() => setLightboxOpen(false)}
+            onClick={(e) => {
+              // This button sits inside the backdrop div, which has its own
+              // onClick={closeLightbox} — without stopping propagation,
+              // both handlers would fire for one click. That used to be
+              // harmless (setLightboxOpen(false) twice is a no-op), but
+              // closeLightbox() now does a history.back() each time, so a
+              // double-fire would skip an extra page back.
+              e.stopPropagation();
+              closeLightbox();
+            }}
             aria-label="Cerrar"
             className="absolute right-3 top-3 z-10 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
           >
