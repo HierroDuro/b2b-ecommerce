@@ -59,7 +59,7 @@ export function Header() {
 
         {/* Right zone: search + actions */}
         <div className="flex min-w-0 flex-col items-end justify-center gap-0.5 md:flex-row md:items-center md:justify-end md:gap-2 lg:gap-4">
-          <div className="hidden min-w-0 w-full max-w-md md:block lg:max-w-lg">
+          <div className="hidden min-w-0 w-full max-w-lg lg:block">
             <SearchBar />
           </div>
           <AccountMenu />

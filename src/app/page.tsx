@@ -87,19 +87,19 @@ export default async function HomePage() {
       <Header />
       <main
         className="mx-auto max-w-[1920px] px-6 pb-20 lg:px-10"
-        style={{ paddingTop: "calc(var(--header-h) + 32px)" }}
+        style={{ paddingTop: "calc(var(--header-h) + 16px)" }}
       >
+        {/* Phone/tablet search, right under the header: the header only has
+            room for its own search bar from lg up. */}
+        <div className="mb-2 lg:hidden">
+          <SearchBar />
+        </div>
+
         <Hero productCount={productCount} showcaseProducts={showcaseProducts} />
 
         <div id="catalogo" className="scroll-mt-[calc(var(--header-h)+16px)]">
           <OffersMarquee offers={onSaleProducts} />
 
-          {/* The header's search bar is hidden below `md`; this gives mobile
-              users the same real-time search without cramming it into the
-              fixed header. */}
-          <div className="mb-5 md:hidden">
-            <SearchBar />
-          </div>
           <Storefront categories={categories} />
         </div>
       </main>
