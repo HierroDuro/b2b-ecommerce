@@ -73,6 +73,15 @@ export function ProductImageGallery({ images, alt }: ProductImageGalleryProps) {
     const wrapper = wrapperRef.current;
     if (!container || !wrapper) return;
 
+    // The prev/next arrows sit on top of the image, inside this same
+    // container — hovering one still fires this handler (mousemove
+    // bubbles), which would otherwise draw the zoom lens right underneath
+    // the button. Hide it instead while the cursor is over an arrow.
+    if ((e.target as HTMLElement).closest("[data-gallery-nav]")) {
+      setIsZooming(false);
+      return;
+    }
+
     const containerRect = container.getBoundingClientRect();
     const wrapperRect = wrapper.getBoundingClientRect();
 
@@ -200,6 +209,7 @@ export function ProductImageGallery({ images, alt }: ProductImageGalleryProps) {
             <>
               <button
                 type="button"
+                data-gallery-nav
                 onClick={(e) => {
                   e.stopPropagation();
                   setActiveIndex((i) => (i - 1 + images.length) % images.length);
@@ -211,6 +221,7 @@ export function ProductImageGallery({ images, alt }: ProductImageGalleryProps) {
               </button>
               <button
                 type="button"
+                data-gallery-nav
                 onClick={(e) => {
                   e.stopPropagation();
                   setActiveIndex((i) => (i + 1) % images.length);
