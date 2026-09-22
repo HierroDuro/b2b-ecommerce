@@ -34,6 +34,10 @@ export function SearchBar({ className }: { className?: string }) {
         className={cn(
           "h-11 rounded-full border-border/80 bg-muted/40 pl-9 pr-9 text-sm",
           "transition-all duration-200 focus-visible:border-primary/40 focus-visible:bg-background focus-visible:ring-4 focus-visible:ring-primary/10",
+          // type="search" gets its own native clear button in Chrome/Edge,
+          // which stacked right next to the custom one below — hide it so
+          // there's only ever the one X.
+          "[&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-cancel-button]:hidden",
         )}
       />
       {draft.length > 0 && (
