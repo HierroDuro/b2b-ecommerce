@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Boxes, Tag, Truck, MessageCircle, type LucideIcon } from "lucide-react";
 
-import { formatCurrency } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import type { ProductDTO } from "@/types/product";
 
 interface HeroProps {
@@ -105,12 +105,12 @@ export function Hero({ showcaseProducts }: HeroProps) {
         </div>
       </motion.div>
 
-      {/* Desktop showcase panel: a 3x3 grid of the 9 cheapest products,
-          bigger than the old 3-card floating collage both in item count
-          and in the space it's given (a wider column + a wider cap here).
-          Phone/tablet get the plain 3x3 row above instead (rendered inline
-          with the text) — this panel needs the extra width of the
-          two-column desktop grid to fit 9 cards without feeling cramped. */}
+      {/* Desktop showcase panel: a single horizontal, scrollable row of the
+          9 cheapest products — a 3x3 grid made this panel much taller than
+          the text column next to it, which is what this avoids. Phone/
+          tablet get the plain 3x3 row above instead (rendered inline with
+          the text) — this panel needs the extra width of the two-column
+          desktop grid to be worth its own space. */}
       <motion.div
         initial={{ opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -133,10 +133,12 @@ export function Hero({ showcaseProducts }: HeroProps) {
             Lo más barato de la tienda
           </p>
 
-          <div className="relative grid grid-cols-3 gap-3">
-            {showcase.map((product) => (
-              <ShowcaseCard key={product.id} product={product} />
-            ))}
+          <div className="relative -mx-1 overflow-x-auto px-1 pb-1 [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex w-max gap-3">
+              {showcase.map((product) => (
+                <ShowcaseCard key={product.id} product={product} className="w-36" />
+              ))}
+            </div>
           </div>
         </div>
       </motion.div>
@@ -144,11 +146,14 @@ export function Hero({ showcaseProducts }: HeroProps) {
   );
 }
 
-function ShowcaseCard({ product }: { product: ProductDTO }) {
+function ShowcaseCard({ product, className }: { product: ProductDTO; className?: string }) {
   return (
     <Link
       href={`/productos/${product.id}`}
-      className="block overflow-hidden rounded-xl border border-border bg-card p-2.5 shadow-card transition-transform hover:z-10 hover:scale-105"
+      className={cn(
+        "block shrink-0 overflow-hidden rounded-xl border border-border bg-card p-2.5 shadow-card transition-transform hover:z-10 hover:scale-105",
+        className,
+      )}
     >
       <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-white">
         <Image src={product.imageUrl} alt={product.name} fill sizes="180px" className="object-contain p-2.5" />
