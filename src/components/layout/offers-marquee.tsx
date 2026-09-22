@@ -95,11 +95,13 @@ export function OffersMarquee({ offers }: { offers: ProductDTO[] }) {
           velocity = idleSpeed;
         } else {
           const { dir, strength, hovering } = hoverRef.current;
+          // Speed is set outright every frame — no easing/lerp toward it —
+          // so hovering the middle stops it dead instead of gradually
+          // winding down (that gradual wind-down was the "laggy" feel).
           // Not hovering at all: keep drifting. Hovering the middle: hold
           // still. Hovering an edge: run toward that side, faster the
           // closer the pointer is to the very edge.
-          const target = !hovering ? idleSpeed : dir === 0 ? 0 : dir * (BASE_SPEED + strength * EDGE_BOOST);
-          velocity += (target - velocity) * Math.min(1, dt * 6);
+          velocity = !hovering ? idleSpeed : dir === 0 ? 0 : dir * (BASE_SPEED + strength * EDGE_BOOST);
           pos += velocity * dt;
         }
         if (pos >= 2 * loop) {
