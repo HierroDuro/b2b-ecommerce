@@ -191,6 +191,37 @@ export function ProductImageGallery({ images, alt }: ProductImageGalleryProps) {
             <ZoomIn className="h-3.5 w-3.5" />
             Ampliar
           </span>
+
+          {/* Prev/next arrows on the main photo itself — the thumbnail
+              rail (or the lightbox) works fine on desktop, but on phone/
+              tablet, where the rail sits to the side of a full-width
+              image, these are the quicker way to flip through photos. */}
+          {images.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveIndex((i) => (i - 1 + images.length) % images.length);
+                }}
+                aria-label={`Imagen anterior de ${alt}`}
+                className="absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-background/90 p-1.5 text-foreground shadow-soft transition-colors hover:bg-background"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveIndex((i) => (i + 1) % images.length);
+                }}
+                aria-label={`Imagen siguiente de ${alt}`}
+                className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-background/90 p-1.5 text-foreground shadow-soft transition-colors hover:bg-background"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </>
+          )}
         </div>
 
         {isZooming && zoom && activeImage && (
