@@ -82,7 +82,6 @@ export default async function HomePage() {
     getOnSaleProducts(),
     getShowcaseProducts(),
   ]);
-  const productCount = categories.reduce((sum, c) => sum + (c.productCount ?? 0), 0);
 
   return (
     <div className="min-h-screen">
@@ -98,7 +97,7 @@ export default async function HomePage() {
         </div>
 
         <HideWhileSearching>
-          <Hero productCount={productCount} showcaseProducts={showcaseProducts} />
+          <Hero showcaseProducts={showcaseProducts} />
         </HideWhileSearching>
 
         <div id="catalogo" className="scroll-mt-[calc(var(--header-h)+16px)]">

@@ -9,7 +9,6 @@ import { formatCurrency } from "@/lib/utils";
 import type { ProductDTO } from "@/types/product";
 
 interface HeroProps {
-  productCount: number;
   showcaseProducts: ProductDTO[];
 }
 
@@ -28,7 +27,7 @@ const valueProps: { icon: LucideIcon; label: string }[] = [
  * the pitch. Kept deliberately calm (no decorative blobs, one restrained
  * brand gradient) per the corporate-B2B direction.
  */
-export function Hero({ productCount, showcaseProducts }: HeroProps) {
+export function Hero({ showcaseProducts }: HeroProps) {
   const showcase = showcaseProducts.slice(0, 9);
 
   return (
@@ -130,13 +129,11 @@ export function Hero({ productCount, showcaseProducts }: HeroProps) {
             }}
           />
 
-          <div className="relative flex justify-end">
-            <span className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-soft">
-              +{productCount} productos
-            </span>
-          </div>
+          <p className="relative mb-4 text-sm font-semibold text-foreground">
+            Lo más barato de la tienda
+          </p>
 
-          <div className="relative mt-4 grid grid-cols-3 gap-3">
+          <div className="relative grid grid-cols-3 gap-3">
             {showcase.map((product) => (
               <ShowcaseCard key={product.id} product={product} />
             ))}
