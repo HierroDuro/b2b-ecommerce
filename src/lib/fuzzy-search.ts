@@ -88,8 +88,13 @@ function wordSimilarity(a: string, b: string): number {
   const distance = levenshtein(a, b);
   const similarity = 1 - distance / Math.max(a.length, b.length);
   // Below this, two words just don't resemble each other enough to be a
-  // plausible typo of one another.
-  return similarity >= 0.6 ? similarity : 0;
+  // plausible typo of one another. 0.6 used to be the cutoff, but that let
+  // through unrelated words that just happen to share several letters —
+  // e.g. searching "parlantes" matched a mouse whose description mentioned
+  // "variante" (0.667 similarity) — while every real single-typo case this
+  // is meant to catch (a missing/extra/swapped letter, like "inalambrico"
+  // vs "inalambico") scores 0.8 or higher.
+  return similarity >= 0.8 ? similarity : 0;
 }
 
 /**
