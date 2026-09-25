@@ -8,24 +8,19 @@ import { z } from "zod";
  * free-text fields like `description`.
  */
 export const productObjectSchema = z.object({
-  sku: z
-    .string()
-    .trim()
-    .min(2, "El SKU debe tener al menos 2 caracteres")
-    .max(64, "El SKU es demasiado largo")
-    .regex(/^[A-Za-z0-9._-]+$/, "El SKU solo puede tener letras, números, guiones y puntos"),
+  // Free-form on purpose: any letters, digits, spaces, dots, slashes, etc.
+  // The SKU is only ever displayed and searched, never used in a URL or
+  // file path, so there is nothing to sanitize it for. Required + unique.
+  sku: z.string().trim().min(1, "El SKU es obligatorio"),
   name: z
     .string()
     .trim()
     .min(3, "El nombre debe tener al menos 3 caracteres")
     .max(160, "El nombre es demasiado largo"),
-  description: z
-    .string()
-    .trim()
-    .min(10, "La descripción debe tener al menos 10 caracteres")
-    .max(2000, "La descripción es demasiado larga"),
+  // Required, but no length limit in either direction beyond "not empty".
+  description: z.string().trim().min(1, "La descripción es obligatoria"),
   brand: z.string().trim().min(1, "La marca es obligatoria").max(80),
-  price: z.coerce.number().positive("El precio debe ser mayor a 0"),
+  price: z.coerce.number().min(0, "El precio no puede ser negativo"),
   isOnSale: z.boolean().default(false),
   // Solo relevante con isOnSale activo — controla el banner corredizo de
   // la home, no la sección "Ofertas" del feed curado (esa siempre muestra
