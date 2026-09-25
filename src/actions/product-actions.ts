@@ -99,11 +99,38 @@ export async function updateProduct(id: string, input: ProductInput): Promise<Ac
   return { success: true, message: "Producto actualizado correctamente." };
 }
 
-export async function deleteProduct(id: string): Promise<ActionResult> {
+/** How many customer inquiries (chats) hang off a product — the admin
+ * delete dialog asks this right before confirming, so it can warn that
+ * deleting the product deletes those conversations too. */
+export async function getProductConversationCount(id: string): Promise<number> {
+  await ensureAdmin();
+  return prisma.conversation.count({ where: { productId: id } });
+}
+
+/** Deletes a product. Conversations reference products with `onDelete:
+ * Restrict` (so a chat can never silently lose the product it's about), so
+ * a product that has inquiries is only deleted when the caller explicitly
+ * passes `deleteConversations: true` — then its conversations (and their
+ * messages, which cascade) go first, in the same transaction. */
+export async function deleteProduct(
+  id: string,
+  options: { deleteConversations?: boolean } = {},
+): Promise<ActionResult> {
   await ensureAdmin();
 
   try {
-    await prisma.product.delete({ where: { id } });
+    const conversationCount = await prisma.conversation.count({ where: { productId: id } });
+    if (conversationCount > 0 && !options.deleteConversations) {
+      return {
+        success: false,
+        message: `Este producto tiene ${conversationCount} consulta${conversationCount === 1 ? "" : "s"}. Confirmá para eliminarlo junto con ellas.`,
+      };
+    }
+
+    await prisma.$transaction([
+      prisma.conversation.deleteMany({ where: { productId: id } }),
+      prisma.product.delete({ where: { id } }),
+    ]);
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
       return { success: false, message: "El producto ya no existe." };
@@ -113,6 +140,7 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
 
   revalidatePath("/");
   revalidatePath("/admin/products");
+  revalidatePath("/admin/consultas");
   return { success: true, message: "Producto eliminado." };
 }
 

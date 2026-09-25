@@ -28,7 +28,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { deleteProduct, toggleProductFlag } from "@/actions/product-actions";
+import { deleteProduct, getProductConversationCount, toggleProductFlag } from "@/actions/product-actions";
 import { formatCurrency } from "@/lib/utils";
 import { fuzzyScore, productSearchText } from "@/lib/fuzzy-search";
 import type { ProductDTO } from "@/types/product";
@@ -37,6 +37,7 @@ export function ProductTable({ products }: { products: ProductDTO[] }) {
   const router = useRouter();
   const [pendingId, setPendingId] = React.useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = React.useState<ProductDTO | null>(null);
+  const [deleteConversationCount, setDeleteConversationCount] = React.useState(0);
   const [search, setSearch] = React.useState("");
 
   // Same typo-tolerant matching as the public catalog (see lib/fuzzy-search)
@@ -66,9 +67,24 @@ export function ProductTable({ products }: { products: ProductDTO[] }) {
     router.refresh();
   };
 
+  // Asked fresh at click time (not baked into the page props) so the
+  // warning's number is always the real, current one.
+  const requestDelete = async (product: ProductDTO) => {
+    setDeleteConversationCount(0);
+    setDeleteTarget(product);
+    try {
+      setDeleteConversationCount(await getProductConversationCount(product.id));
+    } catch {
+      // Count is only for the warning — the delete itself re-checks
+      // server-side and refuses without confirmation if chats exist.
+    }
+  };
+
   const confirmDelete = async () => {
     if (!deleteTarget) return;
-    const result = await deleteProduct(deleteTarget.id);
+    const result = await deleteProduct(deleteTarget.id, {
+      deleteConversations: deleteConversationCount > 0,
+    });
     setDeleteTarget(null);
     if (!result.success) {
       toast.error(result.message);
@@ -192,7 +208,7 @@ export function ProductTable({ products }: { products: ProductDTO[] }) {
                       variant="ghost"
                       size="icon"
                       className="text-destructive hover:text-destructive"
-                      onClick={() => setDeleteTarget(product)}
+                      onClick={() => requestDelete(product)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -283,7 +299,7 @@ export function ProductTable({ products }: { products: ProductDTO[] }) {
               <Button
                 variant="outline"
                 className="flex-1 gap-2 text-destructive hover:text-destructive"
-                onClick={() => setDeleteTarget(product)}
+                onClick={() => requestDelete(product)}
               >
                 <Trash2 className="h-4 w-4" />
                 Eliminar
@@ -303,6 +319,17 @@ export function ProductTable({ products }: { products: ProductDTO[] }) {
               ¿Seguro que querés eliminar &quot;{deleteTarget?.name}&quot;? Esta acción no se puede
               deshacer.
             </DialogDescription>
+            {deleteConversationCount > 0 && (
+              <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                Este producto tiene{" "}
+                <strong>
+                  {deleteConversationCount} consulta{deleteConversationCount === 1 ? "" : "s"}
+                </strong>
+                . Si lo eliminás, también se {deleteConversationCount === 1 ? "borrará" : "borrarán"}{" "}
+                {deleteConversationCount === 1 ? "esa consulta" : "esas consultas"} con todos sus
+                mensajes.
+              </div>
+            )}
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteTarget(null)}>
