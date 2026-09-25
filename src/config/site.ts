@@ -11,7 +11,8 @@ export const siteConfig = {
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   nav: [
     { label: "Productos", href: "/" },
-    { label: "Servicios", href: "/servicios" },
+    // Servicios oculto momentáneamente (ver src/app/servicios/page.tsx).
+    // { label: "Servicios", href: "/servicios" },
     { label: "Nosotros", href: "/nosotros" },
   ],
   contact: {

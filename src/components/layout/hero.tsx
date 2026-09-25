@@ -54,12 +54,7 @@ export function Hero({ showcaseProducts }: HeroProps) {
             Ver catálogo
             <ArrowRight className="h-4 w-4" />
           </Link>
-          <Link
-            href="/servicios"
-            className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary/40 hover:text-primary"
-          >
-            Conocé nuestros servicios
-          </Link>
+          {/* Botón "Conocé nuestros servicios" (/servicios) oculto momentáneamente. */}
         </div>
 
         <dl className="mt-6 grid grid-cols-2 gap-x-4 gap-y-3 sm:mt-10 sm:flex sm:flex-wrap sm:items-center sm:gap-x-8 sm:gap-y-3">

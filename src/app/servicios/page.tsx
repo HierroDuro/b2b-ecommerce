@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { MessageCircle, Phone } from "lucide-react";
 
 import { Header } from "@/components/layout/header";
@@ -31,7 +32,13 @@ const services = [
   },
 ];
 
+// Página oculta momentáneamente: para volver a mostrarla, borrar esta constante
+// y el `notFound()` de abajo, y reactivar el link en src/config/site.ts, el
+// botón en components/layout/hero.tsx y la entrada en app/sitemap.ts.
+const HIDDEN = true;
+
 export default function ServiciosPage() {
+  if (HIDDEN) notFound();
   return (
     <div className="min-h-screen">
       <Header />
