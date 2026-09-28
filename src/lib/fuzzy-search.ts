@@ -64,7 +64,10 @@ function levenshtein(a: string, b: string): number {
   return dist[rows - 1]![cols - 1]!;
 }
 
-const isNumeric = (s: string): boolean => /^[0-9]+$/.test(s);
+/** A "code" word — contains at least one digit, so it's a model number, DPI
+ * count, or SKU-like token (e.g. "20T10", "DX-123" -> "dx"/"123") rather
+ * than natural-language text. */
+const isCode = (s: string): boolean => /[0-9]/.test(s);
 
 /** How similar two individual words are, 0..1. Exact substrings (either
  * direction) always score 1 — this is what makes correctly-typed searches
@@ -73,15 +76,16 @@ const isNumeric = (s: string): boolean => /^[0-9]+$/.test(s);
  * matches almost anything, which would make short, common words match
  * unrelated products.
  *
- * Purely numeric words (DPI counts, model numbers, hyphen-split SKU
- * fragments like the "123" in "DX-123") are exact-match only: substring
- * containment and edit-distance leniency both produce nonsense for numbers
- * — "1200" is not a plausible typo of "12000", and a short digit run like
- * "123" is likely to turn up as a coincidental substring of almost any
- * longer query, which would otherwise register as a "perfect" match. */
+ * Code-like words (DPI counts, model numbers, hyphen-split SKU fragments
+ * like the "123" in "DX-123", or a whole SKU like "20T10") are exact-match
+ * only: substring containment and edit-distance leniency both produce
+ * nonsense for these — "1200" is not a plausible typo of "12000", "20T1" is
+ * not a meaningful prefix-match for "20T10", and "20T10"/"20T11" are one
+ * digit apart but are two completely different products. Natural-language
+ * words stay fuzzy; only tokens with a digit in them get this strictness. */
 function wordSimilarity(a: string, b: string): number {
   if (a === b) return 1;
-  if (isNumeric(a) || isNumeric(b)) return 0;
+  if (isCode(a) || isCode(b)) return 0;
   // Substring containment (either direction) is what makes "teclado" match
   // "teclados" in either the query or the text. But without a length-ratio
   // floor, a short word that happens to be a suffix/prefix of a longer one
