@@ -10,8 +10,39 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useProductFilters } from "@/components/products/product-filters-context";
 import { useProducts } from "@/hooks/use-products";
 import { cn } from "@/lib/utils";
+import type { ProductDTO } from "@/types/product";
 
 type ViewMode = "grid" | "list";
+
+/** One category's slice of the result list, in display order. */
+interface CategorySection {
+  slug: string;
+  name: string;
+  products: ProductDTO[];
+}
+
+/**
+ * Splits the already-sorted result list into one section per category —
+ * e.g. searching "mouse" also matches combo keyboard+mouse sets via their
+ * description, and without this they'd render interleaved into a single
+ * grid, which reads as a messy, unsorted pile. Grouping keeps each
+ * category's products together while preserving the API's sort order both
+ * for the products within a group and for which group appears first (a
+ * category is placed at the position of its best-ranked product).
+ */
+function groupByCategory(products: ProductDTO[]): CategorySection[] {
+  const sections = new Map<string, CategorySection>();
+  for (const product of products) {
+    const { slug, name } = product.category;
+    let section = sections.get(slug);
+    if (!section) {
+      section = { slug, name, products: [] };
+      sections.set(slug, section);
+    }
+    section.products.push(product);
+  }
+  return [...sections.values()];
+}
 
 export function ProductGrid() {
   const { filters } = useProductFilters();
@@ -87,10 +118,23 @@ export function ProductGrid() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4"
+              className="space-y-10"
             >
-              {data.products.map((product, i) => (
-                <ProductCard key={product.id} product={product} index={i} />
+              {groupByCategory(data.products).map((section) => (
+                <section key={section.slug} className="space-y-4">
+                  {/* Only worth labeling once results span more than one
+                      category — a single-category search/filter already
+                      says as much via the sidebar, so a repeated heading
+                      would just be noise. */}
+                  {section.products.length !== data.products.length && (
+                    <CategoryHeading name={section.name} />
+                  )}
+                  <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
+                    {section.products.map((product, i) => (
+                      <ProductCard key={product.id} product={product} index={i} />
+                    ))}
+                  </div>
+                </section>
               ))}
             </motion.div>
           ) : (
@@ -100,16 +144,39 @@ export function ProductGrid() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="flex flex-col gap-3"
+              className="space-y-10"
             >
-              {data.products.map((product, i) => (
-                <ProductListItem key={product.id} product={product} index={i} />
+              {groupByCategory(data.products).map((section) => (
+                <section key={section.slug} className="space-y-4">
+                  {section.products.length !== data.products.length && (
+                    <CategoryHeading name={section.name} />
+                  )}
+                  <div className="flex flex-col gap-3">
+                    {section.products.map((product, i) => (
+                      <ProductListItem key={product.id} product={product} index={i} />
+                    ))}
+                  </div>
+                </section>
               ))}
             </motion.div>
           )}
         </AnimatePresence>
       )}
     </div>
+  );
+}
+
+/** Same heading treatment as the curated homepage feed's category rows,
+ * so grouped search/filter results feel like the same visual language. */
+function CategoryHeading({ name }: { name: string }) {
+  return (
+    <h2 className="flex items-center gap-2.5 text-lg font-semibold tracking-tight text-foreground">
+      <span
+        aria-hidden
+        className="h-6 w-1.5 rounded-full bg-gradient-to-b from-[hsl(var(--aurora-1))] to-[hsl(var(--aurora-2))]"
+      />
+      {name}
+    </h2>
   );
 }
 
