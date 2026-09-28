@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Phone } from "lucide-react";
+import { notFound } from "next/navigation";
+import { MapPin } from "lucide-react";
 
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
@@ -14,7 +15,13 @@ export const metadata: Metadata = {
     "Somos FITOGRAF, una librería comercial, artística, escolar e imprenta ubicada en el Microcentro. Más de 20 años proveyendo soluciones con la más alta calidad.",
 };
 
+// Página oculta momentáneamente: para volver a mostrarla, borrar esta
+// constante y el `notFound()` de abajo, y reactivar el link en
+// src/config/site.ts y la entrada en app/sitemap.ts.
+const HIDDEN = true;
+
 export default async function NosotrosPage() {
+  if (HIDDEN) notFound();
   const [productCount, categoryCount] = await Promise.all([
     prisma.product.count({ where: { isActive: true } }),
     prisma.category.count(),
@@ -110,21 +117,12 @@ export default async function NosotrosPage() {
               Explorá el catálogo completo o llamanos al {siteConfig.contact.phone}.
             </p>
           </div>
-          <div className="flex shrink-0 flex-wrap items-center justify-center gap-3">
-            <a
-              href={siteConfig.contact.phoneHref}
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-soft transition-transform hover:scale-105"
-            >
-              <Phone className="h-4 w-4" />
-              Llamar
-            </a>
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary/40 hover:text-primary"
-            >
-              Ver catálogo
-            </Link>
-          </div>
+          <Link
+            href="/"
+            className="inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-soft transition-transform hover:scale-105"
+          >
+            Ver catálogo
+          </Link>
         </div>
       </main>
       <Footer />

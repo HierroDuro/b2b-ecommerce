@@ -13,7 +13,7 @@ export function Footer() {
 
   return (
     <footer className="border-t border-border bg-background">
-      <div className="mx-auto grid max-w-[1920px] gap-10 px-6 py-12 sm:grid-cols-2 lg:grid-cols-4 lg:px-10">
+      <div className="mx-auto grid max-w-[1920px] gap-10 px-6 py-12 sm:grid-cols-2 lg:grid-cols-3 lg:px-10">
         <div className="space-y-3">
           <SiteLogo className="h-16 sm:h-16 lg:h-[4.5rem]" />
           <p className="max-w-xs text-sm text-muted-foreground">{siteConfig.description}</p>
@@ -32,15 +32,6 @@ export function Footer() {
                 </Link>
               </li>
             ))}
-          </ul>
-        </div>
-
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-foreground">Categorías</h3>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>Tecnología</li>
-            <li>Resmas</li>
-            <li>Gráfica</li>
           </ul>
         </div>
 

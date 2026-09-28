@@ -13,7 +13,8 @@ export const siteConfig = {
     { label: "Productos", href: "/" },
     // Servicios oculto momentáneamente (ver src/app/servicios/page.tsx).
     // { label: "Servicios", href: "/servicios" },
-    { label: "Nosotros", href: "/nosotros" },
+    // Nosotros oculto momentáneamente (ver src/app/nosotros/page.tsx).
+    // { label: "Nosotros", href: "/nosotros" },
   ],
   contact: {
     email: "fitograf@fitograf.com",
