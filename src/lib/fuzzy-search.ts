@@ -82,7 +82,23 @@ const isNumeric = (s: string): boolean => /^[0-9]+$/.test(s);
 function wordSimilarity(a: string, b: string): number {
   if (a === b) return 1;
   if (isNumeric(a) || isNumeric(b)) return 0;
-  if (a.length >= 3 && b.length >= 3 && (a.includes(b) || b.includes(a))) return 1;
+  // Substring containment (either direction) is what makes "teclado" match
+  // "teclados" in either the query or the text. But without a length-ratio
+  // floor, a short word that happens to be a suffix/prefix of a longer one
+  // — "lado" inside "teclado" — would also count as a perfect match, which
+  // is how searching "teclado" used to surface headsets whose description
+  // just mentioned "del lado izquierdo". Requiring the shorter word to be
+  // at least 60% of the longer one keeps real pluralization ("mouse" /
+  // "mouses" = 0.83, "auricular" / "auriculares" = 0.82) while rejecting
+  // coincidental fragments like "lado" (4/7 = 0.57).
+  if (
+    a.length >= 3 &&
+    b.length >= 3 &&
+    (a.includes(b) || b.includes(a)) &&
+    Math.min(a.length, b.length) / Math.max(a.length, b.length) >= 0.6
+  ) {
+    return 1;
+  }
   if (a.length < 4 || b.length < 4) return 0;
 
   const distance = levenshtein(a, b);
