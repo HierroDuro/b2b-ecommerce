@@ -28,7 +28,14 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { deleteProduct, getProductConversationCount, toggleProductFlag } from "@/actions/product-actions";
+import {
+  deleteProduct,
+  getProductConversationCount,
+  toggleProductFlag,
+  updateProductPrice,
+  updateProductStock,
+} from "@/actions/product-actions";
+import { EditableNumberCell } from "@/components/admin/editable-number-cell";
 import { formatCurrency } from "@/lib/utils";
 import { fuzzyScore, productSearchText } from "@/lib/fuzzy-search";
 import type { ProductDTO } from "@/types/product";
@@ -39,18 +46,39 @@ export function ProductTable({ products }: { products: ProductDTO[] }) {
   const [deleteTarget, setDeleteTarget] = React.useState<ProductDTO | null>(null);
   const [deleteConversationCount, setDeleteConversationCount] = React.useState(0);
   const [search, setSearch] = React.useState("");
+  // Optimistic price/stock edits from the inline cells — applied on top of
+  // `products` immediately (before router.refresh() catches up with the
+  // server), so clicking Precio/Stock feels instant.
+  const [overrides, setOverrides] = React.useState<Record<string, { price?: number; stock?: number }>>(
+    {},
+  );
+
+  const productsWithOverrides = React.useMemo(
+    () => products.map((p) => ({ ...p, ...overrides[p.id] })),
+    [products, overrides],
+  );
 
   // Same typo-tolerant matching as the public catalog (see lib/fuzzy-search)
   // — the whole admin catalog is already loaded client-side, so filtering
   // here is a plain in-memory scan, no extra request needed.
   const visibleProducts = React.useMemo(() => {
-    if (!search.trim()) return products;
-    return products
+    if (!search.trim()) return productsWithOverrides;
+    return productsWithOverrides
       .map((p) => ({ product: p, score: fuzzyScore(search, productSearchText(p)) }))
       .filter((s) => s.score > 0)
       .sort((a, b) => b.score - a.score)
       .map((s) => s.product);
-  }, [products, search]);
+  }, [productsWithOverrides, search]);
+
+  const savePrice = (id: string, price: number) => {
+    setOverrides((prev) => ({ ...prev, [id]: { ...prev[id], price } }));
+    router.refresh();
+  };
+
+  const saveStock = (id: string, stock: number) => {
+    setOverrides((prev) => ({ ...prev, [id]: { ...prev[id], stock } }));
+    router.refresh();
+  };
 
   const handleToggle = async (
     product: ProductDTO,
@@ -169,12 +197,24 @@ export function ProductTable({ products }: { products: ProductDTO[] }) {
                   <Badge variant="outline">{product.category.name}</Badge>
                 </TableCell>
                 <TableCell className="text-sm font-medium">
-                  {formatCurrency(product.price)}
+                  <EditableNumberCell
+                    value={product.price}
+                    step={0.01}
+                    format={formatCurrency}
+                    ariaLabel={`precio de ${product.name}`}
+                    onSave={(price) => updateProductPrice(product.id, price)}
+                    onSaved={(price) => savePrice(product.id, price)}
+                  />
                 </TableCell>
                 <TableCell>
-                  <span className={product.stock === 0 ? "text-destructive font-medium" : ""}>
-                    {product.stock}
-                  </span>
+                  <EditableNumberCell
+                    value={product.stock}
+                    format={(v) => String(v)}
+                    ariaLabel={`stock de ${product.name}`}
+                    className={product.stock === 0 ? "font-medium text-destructive" : ""}
+                    onSave={(stock) => updateProductStock(product.id, Math.trunc(stock))}
+                    onSaved={(stock) => saveStock(product.id, Math.trunc(stock))}
+                  />
                 </TableCell>
                 <TableCell>
                   <Switch
@@ -239,18 +279,26 @@ export function ProductTable({ products }: { products: ProductDTO[] }) {
             </div>
 
             <div className="mt-3 flex items-center justify-between">
-              <span className="text-sm font-semibold text-foreground">
-                {formatCurrency(product.price)}
-              </span>
-              <span
-                className={
-                  product.stock === 0
-                    ? "text-sm font-medium text-destructive"
-                    : "text-sm text-muted-foreground"
-                }
-              >
-                Stock: {product.stock}
-              </span>
+              <EditableNumberCell
+                value={product.price}
+                step={0.01}
+                format={formatCurrency}
+                ariaLabel={`precio de ${product.name}`}
+                className="text-sm font-semibold text-foreground"
+                onSave={(price) => updateProductPrice(product.id, price)}
+                onSaved={(price) => savePrice(product.id, price)}
+              />
+              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                Stock:
+                <EditableNumberCell
+                  value={product.stock}
+                  format={(v) => String(v)}
+                  ariaLabel={`stock de ${product.name}`}
+                  className={product.stock === 0 ? "font-medium text-destructive" : ""}
+                  onSave={(stock) => updateProductStock(product.id, Math.trunc(stock))}
+                  onSaved={(stock) => saveStock(product.id, Math.trunc(stock))}
+                />
+              </div>
             </div>
 
             <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-md bg-muted/40 px-3 py-2">

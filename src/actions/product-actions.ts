@@ -185,3 +185,20 @@ export async function updateProductStock(id: string, stock: number): Promise<Act
   revalidatePath("/admin/products");
   return { success: true, message: "Stock actualizado." };
 }
+
+/** Quick single-field price edit used by the admin table's inline cell —
+ * same idea as `updateProductStock`, kept separate rather than a generic
+ * "patch one field" action so each keeps its own validation message. */
+export async function updateProductPrice(id: string, price: number): Promise<ActionResult> {
+  await ensureAdmin();
+
+  if (!Number.isFinite(price) || price < 0) {
+    return { success: false, message: "El precio no puede ser negativo." };
+  }
+
+  await prisma.product.update({ where: { id }, data: { price } });
+
+  revalidatePath("/");
+  revalidatePath("/admin/products");
+  return { success: true, message: "Precio actualizado." };
+}
