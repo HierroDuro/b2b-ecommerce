@@ -26,11 +26,24 @@ interface CategorySection {
  * e.g. searching "mouse" also matches combo keyboard+mouse sets via their
  * description, and without this they'd render interleaved into a single
  * grid, which reads as a messy, unsorted pile. Grouping keeps each
- * category's products together while preserving the API's sort order both
- * for the products within a group and for which group appears first (a
- * category is placed at the position of its best-ranked product).
+ * category's products together, preserving the API's sort order for the
+ * products within a group and, by default, for which group appears first
+ * (first-appearance order from the already-sorted list).
+ *
+ * When there's an active search term, that default order isn't good
+ * enough on its own: "mouse" matches every plain mouse (category
+ * "Mouses") just as strongly as every "Combo Teclado + Mouse" set, from
+ * the product side — both contain the word "mouse" somewhere — so which
+ * section happened to come first was essentially a coin flip. Re-sorting
+ * the sections by `categoryNameMatchRatio` instead fixes that: "Mouses"
+ * is *entirely* the word "mouse" (ratio 1) while "Combos Teclado y Mouse"
+ * only has it as one word out of four (ratio 0.25), so the category whose
+ * name the search is essentially naming wins, which is what someone
+ * searching "mouse" actually expects to see first. Array.prototype.sort
+ * is stable, so sections that tie on that score keep their original
+ * relative (first-appearance) order.
  */
-function groupByCategory(products: ProductDTO[]): CategorySection[] {
+function groupByCategory(products: ProductDTO[], search: string): CategorySection[] {
   const sections = new Map<string, CategorySection>();
   for (const product of products) {
     const { slug, name } = product.category;
@@ -41,13 +54,47 @@ function groupByCategory(products: ProductDTO[]): CategorySection[] {
     }
     section.products.push(product);
   }
-  return [...sections.values()];
+  const result = [...sections.values()];
+  const query = search.trim();
+  if (query) {
+    result.sort(
+      (a, b) => categoryNameMatchRatio(query, b.name) - categoryNameMatchRatio(query, a.name),
+    );
+  }
+  return result;
+}
+
+const normalizeWords = (value: string) =>
+  value
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean);
+
+/** What fraction of the category name's words the search term accounts
+ * for — 1 means the search is (essentially) that whole name, 0 means none
+ * of it matched. See `groupByCategory` for why this, and not a plain
+ * fuzzy-search score, is the right measure for ordering sections. */
+function categoryNameMatchRatio(query: string, categoryName: string): number {
+  const queryWords = normalizeWords(query);
+  const nameWords = normalizeWords(categoryName);
+  if (nameWords.length === 0 || queryWords.length === 0) return 0;
+  const matched = nameWords.filter((word) =>
+    queryWords.some((q) => word.includes(q) || q.includes(word)),
+  ).length;
+  return matched / nameWords.length;
 }
 
 export function ProductGrid() {
   const { filters } = useProductFilters();
   const { data, isLoading, isError } = useProducts(filters);
   const [view, setView] = React.useState<ViewMode>("grid");
+
+  const sections = React.useMemo(
+    () => (data ? groupByCategory(data.products, filters.search) : []),
+    [data, filters.search],
+  );
 
   return (
     <div className="flex-1">
@@ -120,7 +167,7 @@ export function ProductGrid() {
               transition={{ duration: 0.2 }}
               className="space-y-10"
             >
-              {groupByCategory(data.products).map((section) => (
+              {sections.map((section) => (
                 <section key={section.slug} className="space-y-4">
                   {/* Only worth labeling once results span more than one
                       category — a single-category search/filter already
@@ -146,7 +193,7 @@ export function ProductGrid() {
               transition={{ duration: 0.2 }}
               className="space-y-10"
             >
-              {groupByCategory(data.products).map((section) => (
+              {sections.map((section) => (
                 <section key={section.slug} className="space-y-4">
                   {section.products.length !== data.products.length && (
                     <CategoryHeading name={section.name} />
