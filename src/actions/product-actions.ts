@@ -202,3 +202,50 @@ export async function updateProductPrice(id: string, price: number): Promise<Act
   revalidatePath("/admin/products");
   return { success: true, message: "Precio actualizado." };
 }
+
+/** Quick SKU edit from the admin table's inline cell. SKU is free-form
+ * (see product.schema.ts) but still unique, so this still has to handle
+ * the same P2002 collision as the full edit form. */
+export async function updateProductSku(id: string, sku: string): Promise<ActionResult> {
+  await ensureAdmin();
+
+  const trimmed = sku.trim();
+  if (!trimmed) {
+    return { success: false, message: "El SKU es obligatorio." };
+  }
+
+  try {
+    await prisma.product.update({ where: { id }, data: { sku: trimmed } });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+      return { success: false, message: "Ya existe un producto con ese SKU." };
+    }
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
+      return { success: false, message: "El producto ya no existe." };
+    }
+    throw error;
+  }
+
+  revalidatePath("/");
+  revalidatePath("/admin/products");
+  return { success: true, message: "SKU actualizado." };
+}
+
+/** Quick category reassignment from the admin table's inline cell. */
+export async function updateProductCategory(id: string, categoryId: string): Promise<ActionResult> {
+  await ensureAdmin();
+
+  try {
+    await prisma.product.update({ where: { id }, data: { categoryId } });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
+      return { success: false, message: "El producto o la categoría ya no existen." };
+    }
+    throw error;
+  }
+
+  revalidatePath("/");
+  revalidatePath("/admin/products");
+  revalidatePath("/admin/categories");
+  return { success: true, message: "Categoría actualizada." };
+}

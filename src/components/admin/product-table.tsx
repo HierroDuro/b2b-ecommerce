@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
@@ -32,26 +31,39 @@ import {
   deleteProduct,
   getProductConversationCount,
   toggleProductFlag,
+  updateProductCategory,
   updateProductPrice,
+  updateProductSku,
   updateProductStock,
 } from "@/actions/product-actions";
 import { EditableNumberCell } from "@/components/admin/editable-number-cell";
+import { EditableTextCell } from "@/components/admin/editable-text-cell";
+import { EditableCategoryCell } from "@/components/admin/editable-category-cell";
 import { formatCurrency } from "@/lib/utils";
 import { fuzzyScore, productSearchText } from "@/lib/fuzzy-search";
 import type { ProductDTO } from "@/types/product";
 
-export function ProductTable({ products }: { products: ProductDTO[] }) {
+export function ProductTable({
+  products,
+  categories,
+}: {
+  products: ProductDTO[];
+  categories: { id: string; name: string; slug: string }[];
+}) {
   const router = useRouter();
   const [pendingId, setPendingId] = React.useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = React.useState<ProductDTO | null>(null);
   const [deleteConversationCount, setDeleteConversationCount] = React.useState(0);
   const [search, setSearch] = React.useState("");
-  // Optimistic price/stock edits from the inline cells — applied on top of
-  // `products` immediately (before router.refresh() catches up with the
-  // server), so clicking Precio/Stock feels instant.
-  const [overrides, setOverrides] = React.useState<Record<string, { price?: number; stock?: number }>>(
-    {},
-  );
+  // Optimistic price/stock/SKU/category edits from the inline cells —
+  // applied on top of `products` immediately (before router.refresh()
+  // catches up with the server), so editing a cell feels instant.
+  const [overrides, setOverrides] = React.useState<
+    Record<
+      string,
+      { price?: number; stock?: number; sku?: string; category?: { id: string; name: string; slug: string } }
+    >
+  >({});
 
   const productsWithOverrides = React.useMemo(
     () => products.map((p) => ({ ...p, ...overrides[p.id] })),
@@ -77,6 +89,20 @@ export function ProductTable({ products }: { products: ProductDTO[] }) {
 
   const saveStock = (id: string, stock: number) => {
     setOverrides((prev) => ({ ...prev, [id]: { ...prev[id], stock } }));
+    router.refresh();
+  };
+
+  const saveSku = (id: string, sku: string) => {
+    setOverrides((prev) => ({ ...prev, [id]: { ...prev[id], sku } }));
+    router.refresh();
+  };
+
+  const saveCategory = (id: string, categoryId: string, categoryName: string) => {
+    const category = categories.find((c) => c.id === categoryId);
+    setOverrides((prev) => ({
+      ...prev,
+      [id]: { ...prev[id], category: { id: categoryId, name: categoryName, slug: category?.slug ?? "" } },
+    }));
     router.refresh();
   };
 
@@ -192,9 +218,23 @@ export function ProductTable({ products }: { products: ProductDTO[] }) {
                     </span>
                   </div>
                 </TableCell>
-                <TableCell className="text-xs text-muted-foreground">{product.sku}</TableCell>
+                <TableCell className="text-xs text-muted-foreground">
+                  <EditableTextCell
+                    value={product.sku}
+                    ariaLabel={`SKU de ${product.name}`}
+                    onSave={(sku) => updateProductSku(product.id, sku)}
+                    onSaved={(sku) => saveSku(product.id, sku)}
+                  />
+                </TableCell>
                 <TableCell>
-                  <Badge variant="outline">{product.category.name}</Badge>
+                  <EditableCategoryCell
+                    categoryId={product.category.id}
+                    categoryName={product.category.name}
+                    categories={categories}
+                    ariaLabel={`categoría de ${product.name}`}
+                    onSave={(categoryId) => updateProductCategory(product.id, categoryId)}
+                    onSaved={(categoryId, categoryName) => saveCategory(product.id, categoryId, categoryName)}
+                  />
                 </TableCell>
                 <TableCell className="text-sm font-medium">
                   <EditableNumberCell
@@ -271,11 +311,24 @@ export function ProductTable({ products }: { products: ProductDTO[] }) {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="line-clamp-1 text-sm font-medium text-foreground">{product.name}</p>
-                <p className="text-xs text-muted-foreground">{product.sku}</p>
+                <EditableTextCell
+                  value={product.sku}
+                  ariaLabel={`SKU de ${product.name}`}
+                  className="text-xs text-muted-foreground"
+                  onSave={(sku) => updateProductSku(product.id, sku)}
+                  onSaved={(sku) => saveSku(product.id, sku)}
+                />
               </div>
-              <Badge variant="outline" className="shrink-0">
-                {product.category.name}
-              </Badge>
+              <div className="shrink-0">
+                <EditableCategoryCell
+                  categoryId={product.category.id}
+                  categoryName={product.category.name}
+                  categories={categories}
+                  ariaLabel={`categoría de ${product.name}`}
+                  onSave={(categoryId) => updateProductCategory(product.id, categoryId)}
+                  onSaved={(categoryId, categoryName) => saveCategory(product.id, categoryId, categoryName)}
+                />
+              </div>
             </div>
 
             <div className="mt-3 flex items-center justify-between">

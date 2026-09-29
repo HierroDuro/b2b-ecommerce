@@ -32,7 +32,10 @@ async function getProducts(): Promise<ProductDTO[]> {
 }
 
 export default async function AdminProductsPage() {
-  const products = await getProducts();
+  const [products, categories] = await Promise.all([
+    getProducts(),
+    prisma.category.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, slug: true } }),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -49,7 +52,7 @@ export default async function AdminProductsPage() {
         </Button>
       </div>
 
-      <ProductTable products={products} />
+      <ProductTable products={products} categories={categories} />
     </div>
   );
 }
