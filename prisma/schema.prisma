@@ -211,6 +211,10 @@ model Conversation {
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Restrict)
 
+  /// Opción de producto elegida al consultar (ej. "5 TB", "Rosa"); null si el
+  /// producto no tiene variantes. Define qué precio/foto se muestran en la consulta.
+  variantLabel String?
+
   messages Message[]
 
   // Marca de tiempo del último "está escribiendo": si es reciente (pocos

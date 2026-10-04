@@ -40,6 +40,7 @@ async function loadConversationForAdmin(conversationId: string) {
 
 export async function startConversation(
   productId: string,
+  variantLabel?: string,
 ): Promise<
   | { success: true; conversationId: string; isNew: boolean; defaultMessage: string }
   | { success: false; message: string }
@@ -49,8 +50,21 @@ export async function startConversation(
     return { success: false, message: "Necesitás iniciar sesión para consultar." };
   }
 
+  // Only keep a variant that really belongs to this product — the label
+  // comes from the client, so it can't be trusted to pick the price shown.
+  let variant: string | null = null;
+  if (variantLabel) {
+    const match = await prisma.productVariant.findFirst({
+      where: { productId, label: variantLabel },
+      select: { label: true },
+    });
+    variant = match?.label ?? null;
+  }
+
+  // Each option is its own inquiry: asking about the 5 TB must not land in
+  // an open conversation that was about the 1 TB.
   const existing = await prisma.conversation.findFirst({
-    where: { userId: session.user.id, productId, status: { not: "CLOSED" } },
+    where: { userId: session.user.id, productId, variantLabel: variant, status: { not: "CLOSED" } },
     orderBy: { createdAt: "desc" },
   });
 
@@ -64,7 +78,7 @@ export async function startConversation(
   }
 
   const conversation = await prisma.conversation.create({
-    data: { userId: session.user.id, productId, status: "NEW" },
+    data: { userId: session.user.id, productId, variantLabel: variant, status: "NEW" },
   });
 
   return {
@@ -279,6 +293,7 @@ export async function getCustomerConversations(search?: string) {
     id: c.id,
     status: c.status,
     product: c.product,
+    variantLabel: c.variantLabel,
     lastMessage: c.messages[0]?.body ?? null,
     lastMessageAt: (c.messages[0]?.createdAt ?? c.createdAt).toISOString(),
     unreadCount: c._count.messages,
@@ -307,13 +322,22 @@ export async function getConversationProductContext(conversationId: string) {
     where: { id: conversationId },
     include: {
       product: {
-        include: { category: { select: { name: true } } },
+        include: {
+          category: { select: { name: true } },
+          variants: { orderBy: { order: "asc" } },
+        },
       },
       user: { select: { name: true, email: true } },
     },
   });
   if (!conversation) return null;
   if (customerSession && conversation.userId !== customerSession.user.id) return null;
+
+  // The option picked at inquiry time sets the price (and photo) the card
+  // shows; a variant without its own price falls back to the product's.
+  const variant = conversation.variantLabel
+    ? conversation.product.variants.find((v) => v.label === conversation.variantLabel)
+    : undefined;
 
   return {
     id: conversation.id,
@@ -327,9 +351,12 @@ export async function getConversationProductContext(conversationId: string) {
       sku: adminSession ? conversation.product.sku : undefined,
       brand: conversation.product.brand,
       category: conversation.product.category.name,
-      price: Number(conversation.product.price),
+      price: variant?.price != null ? Number(variant.price) : Number(conversation.product.price),
+      variant: variant
+        ? { optionName: conversation.product.optionName, label: variant.label }
+        : undefined,
       stock: adminSession ? conversation.product.stock : undefined,
-      imageUrl: conversation.product.imageUrl,
+      imageUrl: variant?.imageUrl ?? conversation.product.imageUrl,
       isFeatured: conversation.product.isFeatured,
       isOnSale: conversation.product.isOnSale,
     },
@@ -424,6 +451,7 @@ export async function getAdminConversations(filters: AdminConversationFilters) {
     id: c.id,
     status: c.status,
     product: c.product,
+    variantLabel: c.variantLabel,
     customer: c.user,
     lastMessage: c.messages[0]?.body ?? null,
     lastMessageAt: (c.messages[0]?.createdAt ?? c.createdAt).toISOString(),

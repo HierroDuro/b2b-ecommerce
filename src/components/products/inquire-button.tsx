@@ -14,7 +14,8 @@ import { cn } from "@/lib/utils";
 interface InquireButtonProps {
   productId: string;
   productName: string;
-  /** Selected variant (e.g. "Color: Rosa"), carried into the opening message. */
+  /** Label of the selected variant (e.g. "Rosa"); saved on the conversation so its
+   * product card shows that option's price. */
   variantLabel?: string;
   disabled?: boolean;
   className?: string;
@@ -43,7 +44,7 @@ export function InquireButton({
 
   const proceedToConversation = async () => {
     setLoading(true);
-    const result = await startConversation(productId);
+    const result = await startConversation(productId, variantLabel);
     setLoading(false);
 
     if (!result.success) {
@@ -51,11 +52,7 @@ export function InquireButton({
       return;
     }
 
-    const params = new URLSearchParams();
-    if (result.isNew) params.set("prefill", "1");
-    if (variantLabel) params.set("variant", variantLabel);
-    const query = params.toString();
-    router.push(`/consultas/${result.conversationId}${query ? `?${query}` : ""}`);
+    router.push(`/consultas/${result.conversationId}${result.isNew ? "?prefill=1" : ""}`);
   };
 
   const handleClick = () => {

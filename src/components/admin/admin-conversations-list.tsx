@@ -122,7 +122,7 @@ export function AdminConversationsList({ filterOptions }: { filterOptions: Filte
             <ConversationRow
               key={c.id}
               href={`/admin/consultas/${c.id}`}
-              productName={c.product.name}
+              productName={c.variantLabel ? `${c.product.name} · ${c.variantLabel}` : c.product.name}
               productImageUrl={c.product.imageUrl}
               status={c.status}
               lastMessage={c.lastMessage}

@@ -84,7 +84,7 @@ export function ProductVariantPanel({
       <InquireButton
         productId={productId}
         productName={productName}
-        variantLabel={selected ? `${optionName}: ${selected.label}` : undefined}
+        variantLabel={selected?.label}
         size="lg"
         className="mt-1 w-full sm:w-auto"
       />

@@ -13,7 +13,10 @@ interface ProductMiniCardProps {
   sku?: string;
   brand: string;
   category: string;
+  /** Already the price of the picked option, when the inquiry was about one. */
   price: number;
+  /** The option the customer picked (e.g. Capacidad: 5 TB), if any. */
+  variant?: { optionName: string; label: string };
   imageUrl: string;
   isFeatured: boolean;
   isOnSale: boolean;
@@ -60,6 +63,11 @@ export function ProductMiniCard(product: ProductMiniCardProps) {
             Marca: {product.brand}
             {product.sku !== undefined && ` · SKU: ${product.sku}`}
           </p>
+          {product.variant && (
+            <p className="truncate text-xs font-medium text-foreground">
+              {product.variant.optionName}: {product.variant.label}
+            </p>
+          )}
           {product.stock !== undefined && (
             <p
               className={cn(
