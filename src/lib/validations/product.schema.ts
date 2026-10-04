@@ -40,6 +40,27 @@ export const productObjectSchema = z.object({
     z.number().positive("El precio original debe ser mayor a 0").nullable(),
   ),
   stock: z.coerce.number().int().min(0, "El stock no puede ser negativo"),
+  // Variantes opcionales (ej. el mismo cable en Blanco o en Rosa). `optionName`
+  // es el titulo del selector en la pagina del producto ("Color", "Capacidad").
+  optionName: z.string().trim().min(1).max(40).default("Color"),
+  variants: z
+    .array(
+      z.object({
+        label: z.string().trim().min(1, "Poné un nombre para la variante").max(60),
+        // Vacio = usa el precio del producto.
+        price: z.preprocess(
+          (value) => {
+            if (value === null || value === undefined) return null;
+            if (typeof value === "string" && value.trim() === "") return null;
+            return typeof value === "string" ? Number(value) : value;
+          },
+          z.number().min(0, "El precio no puede ser negativo").nullable(),
+        ),
+      }),
+    )
+    .max(30, "Máximo 30 variantes")
+    .optional()
+    .default([]),
   imageUrl: z.string().min(1, "La imagen es obligatoria"),
   images: z.array(z.string().min(1)).max(8, "Máximo 8 imágenes de galería").optional().default([]),
   categoryId: z.string().min(1, "La categoría es obligatoria"),

@@ -6,10 +6,10 @@ import { Star, ChevronRight } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Badge } from "@/components/ui/badge";
-import { InquireButton } from "@/components/products/inquire-button";
+import { ProductVariantPanel } from "@/components/products/product-variant-panel";
 import { ProductImageGallery } from "@/components/products/product-image-gallery";
 import { prisma } from "@/lib/prisma";
-import { formatCurrency } from "@/lib/utils";
+import { toVariantDTOs } from "@/lib/variants";
 import { siteConfig } from "@/config/site";
 
 interface ProductPageParams {
@@ -29,6 +29,7 @@ async function getVisibleProduct(id: string) {
     include: {
       category: { select: { id: true, name: true, slug: true } },
       images: { orderBy: { order: "asc" } },
+      variants: { orderBy: { order: "asc" } },
     },
   });
 }
@@ -69,6 +70,7 @@ export default async function ProductPage({ params }: ProductPageParams) {
   const gallery = [product.imageUrl, ...product.images.map((i) => i.url)];
   const price = Number(product.price);
   const originalPrice = product.originalPrice ? Number(product.originalPrice) : null;
+  const variants = toVariantDTOs(product.variants);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -140,20 +142,14 @@ export default async function ProductPage({ params }: ProductPageParams) {
               Marca <span className="font-medium text-foreground">{product.brand}</span>
             </p>
 
-            <div className="flex flex-wrap items-baseline gap-3">
-              {product.isOnSale && originalPrice && (
-                <span className="text-lg text-muted-foreground line-through">
-                  {formatCurrency(originalPrice)}
-                </span>
-              )}
-              <span className="text-3xl font-bold text-foreground">{formatCurrency(price)}</span>
-            </div>
-
-            <InquireButton
+            <ProductVariantPanel
               productId={product.id}
               productName={product.name}
-              size="lg"
-              className="mt-1 w-full sm:w-auto"
+              price={price}
+              originalPrice={originalPrice}
+              isOnSale={product.isOnSale}
+              optionName={product.optionName}
+              variants={variants}
             />
 
             <div className="mt-4 border-t border-border pt-4">

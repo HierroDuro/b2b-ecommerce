@@ -58,11 +58,15 @@ model Product {
   // oferta sin importar este flag. Default true para no romper el banner
   // de los productos ya marcados isOnSale antes de que existiera este campo.
   showInBanner  Boolean  @default(true)
+  // Nombre del selector de variantes ("Color", "Capacidad", ...). Solo se
+  // muestra si el producto tiene variantes cargadas (ver ProductVariant).
+  optionName    String   @default("Color")
 
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
 
   images        ProductImage[]
+  variants      ProductVariant[]
   conversations Conversation[]
 
   createdAt DateTime @default(now())
@@ -92,6 +96,25 @@ model ProductImage {
 
   @@index([productId])
   @@map("product_images")
+}
+
+/// Variante de un producto (ej. el mismo cable en Blanco o en Rosa). El
+/// producto sigue siendo uno solo; cada variante puede tener su propio
+/// precio (si es null se usa el del producto) y su propia imagen (si es
+/// null se usa la del producto).
+model ProductVariant {
+  id        String   @id @default(cuid())
+  label     String
+  price     Decimal?
+  imageUrl  String?
+  order     Int      @default(0)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+  @@map("product_variants")
 }
 
 /// Rol de un usuario administrador. Todo el panel (incluida la sección

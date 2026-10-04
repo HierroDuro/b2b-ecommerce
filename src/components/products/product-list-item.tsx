@@ -8,12 +8,16 @@ import { Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { InquireButton } from "@/components/products/inquire-button";
 import { formatCurrency, truncate } from "@/lib/utils";
+import { lowestPrice } from "@/lib/variants";
 import type { ProductDTO } from "@/types/product";
 
 /** Compact row layout used by the grid/list view toggle. */
 export function ProductListItem({ product, index = 0 }: { product: ProductDTO; index?: number }) {
   const outOfStock = product.stock <= 0;
   const href = `/productos/${product.id}`;
+  const variants = product.variants ?? [];
+  const fromPrice = lowestPrice(product.price, variants);
+  const pricesVary = variants.some((v) => (v.price ?? product.price) !== fromPrice) || product.price !== fromPrice;
 
   return (
     <motion.article
@@ -57,7 +61,10 @@ export function ProductListItem({ product, index = 0 }: { product: ProductDTO; i
               {formatCurrency(product.originalPrice)}
             </span>
           )}
-          <span className="text-base font-bold text-foreground">{formatCurrency(product.price)}</span>
+          <span className="text-base font-bold text-foreground">
+            {pricesVary && <span className="mr-1 text-xs font-normal text-muted-foreground">Desde</span>}
+            {formatCurrency(fromPrice)}
+          </span>
         </div>
         <InquireButton productId={product.id} productName={product.name} />
       </div>

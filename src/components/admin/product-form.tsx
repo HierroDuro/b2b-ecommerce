@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Loader2, Upload, X, Plus } from "lucide-react";
@@ -62,6 +62,8 @@ export function ProductForm({ categories, product }: ProductFormProps) {
           stock: product.stock,
           imageUrl: product.imageUrl,
           images: product.images,
+          optionName: product.optionName,
+          variants: (product.variants ?? []).map((v) => ({ label: v.label, price: v.price })),
           categoryId: product.categoryId,
           isFeatured: product.isFeatured,
           isActive: product.isActive,
@@ -74,8 +76,16 @@ export function ProductForm({ categories, product }: ProductFormProps) {
           originalPrice: null,
           stock: 0,
           images: [],
+          optionName: "Color",
+          variants: [],
         },
   });
+
+  const {
+    fields: variantFields,
+    append: appendVariant,
+    remove: removeVariant,
+  } = useFieldArray({ control, name: "variants" });
 
   const imageUrl = watch("imageUrl");
   const images = watch("images") ?? [];
@@ -357,6 +367,70 @@ export function ProductForm({ categories, product }: ProductFormProps) {
           )}
         </div>
         {errors.images && <p className="text-xs text-destructive">{errors.images.message}</p>}
+      </div>
+
+      <div className="space-y-3 rounded-lg border border-border p-4">
+        <div className="space-y-0.5">
+          <Label>Variantes (opcional)</Label>
+          <p className="text-xs text-muted-foreground">
+            Para el mismo producto en distintos colores (o capacidades): en la página del
+            producto el cliente elige una opción. Si dejás el precio vacío, usa el del producto.
+          </p>
+        </div>
+        {variantFields.length > 0 && (
+          <div className="space-y-1.5">
+            <Label htmlFor="optionName" className="text-xs">
+              Título del selector
+            </Label>
+            <Input id="optionName" className="max-w-[12rem]" placeholder="Color" {...register("optionName")} />
+          </div>
+        )}
+        {variantFields.map((field, index) => (
+          <div key={field.id} className="flex items-start gap-2">
+            <div className="flex-1 space-y-1">
+              <Input
+                placeholder="Ej: Blanco"
+                aria-label={`Nombre de la variante ${index + 1}`}
+                {...register(`variants.${index}.label` as const)}
+              />
+              {errors.variants?.[index]?.label && (
+                <p className="text-xs text-destructive">{errors.variants[index]?.label?.message}</p>
+              )}
+            </div>
+            <div className="w-40 space-y-1">
+              <Input
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="Precio (opcional)"
+                aria-label={`Precio de la variante ${index + 1}`}
+                {...register(`variants.${index}.price` as const)}
+              />
+              {errors.variants?.[index]?.price && (
+                <p className="text-xs text-destructive">{errors.variants[index]?.price?.message}</p>
+              )}
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => removeVariant(index)}
+              aria-label={`Quitar variante ${index + 1}`}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        ))}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="gap-2"
+          onClick={() => appendVariant({ label: "", price: null })}
+        >
+          <Plus className="h-4 w-4" />
+          Agregar variante
+        </Button>
       </div>
 
       <div className="divide-y divide-border rounded-lg border border-border">

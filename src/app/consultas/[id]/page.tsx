@@ -24,13 +24,13 @@ export default async function ConversationPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ prefill?: string }>;
+  searchParams: Promise<{ prefill?: string; variant?: string }>;
 }) {
   const session = await requireCustomerSession();
   if (!session) redirect("/cuenta/ingresar");
 
   const { id } = await params;
-  const { prefill } = await searchParams;
+  const { prefill, variant } = await searchParams;
 
   const context = await getConversationProductContext(id);
   if (!context) notFound();
@@ -70,7 +70,12 @@ export default async function ConversationPage({
           <ProductMiniCard {...context.product} />
         </div>
 
-        <ChatThread conversationId={id} prefill={prefill === "1" ? DEFAULT_INQUIRY_MESSAGE : undefined} />
+        <ChatThread conversationId={id} prefill={
+            prefill === "1" || variant
+              ? `${DEFAULT_INQUIRY_MESSAGE}${variant ? ` (${variant.slice(0, 80)})` : ""}`
+              : undefined
+          }
+        />
       </main>
       <Footer />
     </div>

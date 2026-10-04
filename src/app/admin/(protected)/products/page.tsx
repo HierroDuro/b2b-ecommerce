@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProductTable } from "@/components/admin/product-table";
 import { prisma } from "@/lib/prisma";
+import { toVariantDTOs } from "@/lib/variants";
 import type { ProductDTO } from "@/types/product";
 
 export const metadata: Metadata = {
@@ -18,6 +19,7 @@ async function getProducts(): Promise<ProductDTO[]> {
     include: {
       category: { select: { id: true, name: true, slug: true } },
       images: { orderBy: { order: "asc" } },
+      variants: { orderBy: { order: "asc" } },
     },
   });
 
@@ -26,6 +28,7 @@ async function getProducts(): Promise<ProductDTO[]> {
     price: Number(p.price),
     originalPrice: p.originalPrice ? Number(p.originalPrice) : null,
     images: p.images.map((i) => i.url),
+    variants: toVariantDTOs(p.variants),
     createdAt: p.createdAt.toISOString(),
     updatedAt: p.updatedAt.toISOString(),
   }));

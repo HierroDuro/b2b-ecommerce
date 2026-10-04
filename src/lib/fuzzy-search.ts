@@ -162,6 +162,9 @@ export function productSearchText(p: {
   sku: string;
   description: string;
   category: { name: string };
+  variants?: { label: string }[];
 }): string {
-  return `${p.name} ${p.brand} ${p.sku} ${p.description} ${p.category.name}`;
+  // Variant labels ("Rosa", "128 GB") are searchable too.
+  const variantText = (p.variants ?? []).map((v) => v.label).join(" ");
+  return `${p.name} ${p.brand} ${p.sku} ${p.description} ${p.category.name} ${variantText}`;
 }

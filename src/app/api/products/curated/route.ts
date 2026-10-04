@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/prisma";
+import { toVariantDTOs } from "@/lib/variants";
 import { sortAvailableFirst } from "@/lib/utils";
 import type { CategoryDTO, CuratedFeedResponse, CuratedSection, ProductDTO } from "@/types/product";
 
@@ -39,13 +40,14 @@ export async function GET() {
     const products = await prisma.product.findMany({
       where: { isActive: true, categoryId: category.id },
       orderBy: [{ isOnSale: "desc" }, { isFeatured: "desc" }, { createdAt: "desc" }],
-      include: { images: { orderBy: { order: "asc" } } },
+      include: { images: { orderBy: { order: "asc" } }, variants: { orderBy: { order: "asc" } } },
     });
     const dtos = products.map((p) => ({
       ...p,
       price: Number(p.price),
       originalPrice: p.originalPrice ? Number(p.originalPrice) : null,
       images: p.images.map((i) => i.url),
+    variants: toVariantDTOs(p.variants),
       createdAt: p.createdAt.toISOString(),
       updatedAt: p.updatedAt.toISOString(),
       category: { id: category.id, name: category.name, slug: category.slug },

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import type { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
+import { toVariantDTOs } from "@/lib/variants";
 import { productQuerySchema } from "@/lib/validations/product.schema";
 import { fuzzyScore, productSearchText } from "@/lib/fuzzy-search";
 import { sortAvailableFirst } from "@/lib/utils";
@@ -34,7 +35,11 @@ import type { ProductDTO, ProductListResponse } from "@/types/product";
 
 function toDTO(
   p: Prisma.ProductGetPayload<{
-    include: { category: { select: { id: true; name: true; slug: true } }; images: true };
+    include: {
+      category: { select: { id: true; name: true; slug: true } };
+      images: true;
+      variants: true;
+    };
   }>,
 ): ProductDTO {
   return {
@@ -42,6 +47,7 @@ function toDTO(
     price: Number(p.price),
     originalPrice: p.originalPrice ? Number(p.originalPrice) : null,
     images: p.images.map((i) => i.url),
+    variants: toVariantDTOs(p.variants),
     createdAt: p.createdAt.toISOString(),
     updatedAt: p.updatedAt.toISOString(),
   };
@@ -114,6 +120,7 @@ export async function GET(request: NextRequest) {
       include: {
         category: { select: { id: true, name: true, slug: true } },
         images: { orderBy: { order: "asc" } },
+      variants: { orderBy: { order: "asc" } },
       },
     }),
     prisma.product.findMany({

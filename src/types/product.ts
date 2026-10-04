@@ -1,5 +1,14 @@
 import type { Category, Product } from "@prisma/client";
 
+/** One selectable option of a product (e.g. the same cable in "Rosa"). A null
+ * price/imageUrl means "same as the product". */
+export interface ProductVariantDTO {
+  id: string;
+  label: string;
+  price: number | null;
+  imageUrl: string | null;
+}
+
 /** Product shape as returned to the client: Decimal fields become plain numbers. */
 export interface ProductDTO
   extends Omit<Product, "price" | "originalPrice" | "createdAt" | "updatedAt"> {
@@ -11,6 +20,8 @@ export interface ProductDTO
   category: Pick<Category, "id" | "name" | "slug">;
   /** Additional gallery image URLs (besides the cover `imageUrl`), in display order. */
   images: string[];
+  /** Selectable variants (colors, capacities...). Absent/empty = no selector. */
+  variants?: ProductVariantDTO[];
 }
 
 export interface CategoryDTO extends Category {

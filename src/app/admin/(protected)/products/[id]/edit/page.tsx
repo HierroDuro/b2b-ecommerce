@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { ProductForm } from "@/components/admin/product-form";
 import { prisma } from "@/lib/prisma";
+import { toVariantDTOs } from "@/lib/variants";
 
 export const metadata: Metadata = {
   title: "Editar producto",
@@ -22,6 +23,7 @@ export default async function EditProductPage({
       include: {
         category: { select: { id: true, name: true, slug: true } },
         images: { orderBy: { order: "asc" } },
+      variants: { orderBy: { order: "asc" } },
       },
     }),
     prisma.category.findMany({ orderBy: { name: "asc" } }),
@@ -34,6 +36,7 @@ export default async function EditProductPage({
     price: Number(product.price),
     originalPrice: product.originalPrice ? Number(product.originalPrice) : null,
     images: product.images.map((i) => i.url),
+    variants: toVariantDTOs(product.variants),
     createdAt: product.createdAt.toISOString(),
     updatedAt: product.updatedAt.toISOString(),
   };

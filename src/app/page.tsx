@@ -5,6 +5,7 @@ import { CatalogSection } from "@/components/layout/catalog-section";
 import { HideWhileSearching } from "@/components/layout/hide-while-searching";
 import { SearchBar } from "@/components/products/search-bar";
 import { prisma } from "@/lib/prisma";
+import { toVariantDTOs } from "@/lib/variants";
 import type { CategoryDTO, ProductDTO } from "@/types/product";
 
 // Product data changes often (stock, prices), so this page revalidates
@@ -38,6 +39,7 @@ async function getOnSaleProducts(): Promise<ProductDTO[]> {
     include: {
       category: { select: { id: true, name: true, slug: true } },
       images: { orderBy: { order: "asc" } },
+      variants: { orderBy: { order: "asc" } },
     },
   });
   return products.map((p) => ({
@@ -45,6 +47,7 @@ async function getOnSaleProducts(): Promise<ProductDTO[]> {
     price: Number(p.price),
     originalPrice: p.originalPrice ? Number(p.originalPrice) : null,
     images: p.images.map((i) => i.url),
+    variants: toVariantDTOs(p.variants),
     createdAt: p.createdAt.toISOString(),
     updatedAt: p.updatedAt.toISOString(),
   }));
@@ -63,6 +66,7 @@ async function getShowcaseProducts(): Promise<ProductDTO[]> {
     include: {
       category: { select: { id: true, name: true, slug: true } },
       images: { orderBy: { order: "asc" } },
+      variants: { orderBy: { order: "asc" } },
     },
   });
   return products.map((p) => ({
@@ -70,6 +74,7 @@ async function getShowcaseProducts(): Promise<ProductDTO[]> {
     price: Number(p.price),
     originalPrice: p.originalPrice ? Number(p.originalPrice) : null,
     images: p.images.map((i) => i.url),
+    variants: toVariantDTOs(p.variants),
     createdAt: p.createdAt.toISOString(),
     updatedAt: p.updatedAt.toISOString(),
   }));

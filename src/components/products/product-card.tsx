@@ -9,6 +9,7 @@ import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { InquireButton } from "@/components/products/inquire-button";
 import { cn, formatCurrency, truncate } from "@/lib/utils";
+import { lowestPrice } from "@/lib/variants";
 import type { ProductDTO } from "@/types/product";
 
 interface ProductCardProps {
@@ -33,6 +34,10 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
   );
   const [activeImage, setActiveImage] = React.useState(0);
   const href = `/productos/${product.id}`;
+  const variants = product.variants ?? [];
+  const fromPrice = lowestPrice(product.price, variants);
+  // "Desde" only when picking an option can actually change the price.
+  const pricesVary = variants.some((v) => (v.price ?? product.price) !== fromPrice) || product.price !== fromPrice;
 
   return (
     <motion.article
@@ -159,10 +164,16 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
                 {formatCurrency(product.originalPrice)}
               </span>
             )}
+            {pricesVary && <span className="text-xs text-muted-foreground">Desde</span>}
             <span className="text-base font-bold text-foreground sm:text-lg">
-              {formatCurrency(product.price)}
+              {formatCurrency(fromPrice)}
             </span>
           </div>
+          {variants.length > 1 && (
+            <p className="-mt-1 text-xs text-muted-foreground">
+              {variants.length} opciones de {product.optionName.toLowerCase()}
+            </p>
+          )}
 
           <InquireButton
             productId={product.id}

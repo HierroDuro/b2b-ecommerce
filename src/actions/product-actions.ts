@@ -41,11 +41,15 @@ export async function createProduct(input: ProductInput): Promise<ActionResult> 
     };
   }
 
-  const { images, ...data } = parsed.data;
+  const { images, variants, ...data } = parsed.data;
 
   try {
     await prisma.product.create({
-      data: { ...data, images: { create: images.map((url, order) => ({ url, order })) } },
+      data: {
+        ...data,
+        images: { create: images.map((url, order) => ({ url, order })) },
+        variants: { create: variants.map((v, order) => ({ label: v.label, price: v.price, order })) },
+      },
     });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
@@ -71,7 +75,14 @@ export async function updateProduct(id: string, input: ProductInput): Promise<Ac
     };
   }
 
-  const { images, ...data } = parsed.data;
+  const { images, variants, ...data } = parsed.data;
+
+  // Variant photos aren't editable in the admin form, so a save would
+  // wipe them with the delete+recreate below; carry each existing one over
+  // to the variant that still has the same label.
+  const existingVariantImages = new Map(
+    (await prisma.productVariant.findMany({ where: { productId: id } })).map((v) => [v.label, v.imageUrl]),
+  );
 
   try {
     // Replace the whole gallery on every save rather than diffing — product
@@ -82,6 +93,16 @@ export async function updateProduct(id: string, input: ProductInput): Promise<Ac
       data: {
         ...data,
         images: { deleteMany: {}, create: images.map((url, order) => ({ url, order })) },
+        // Same replace-the-whole-list approach as the gallery.
+        variants: {
+          deleteMany: {},
+          create: variants.map((v, order) => ({
+            label: v.label,
+            price: v.price,
+            order,
+            imageUrl: existingVariantImages.get(v.label) ?? null,
+          })),
+        },
       },
     });
   } catch (error) {

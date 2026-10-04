@@ -14,6 +14,8 @@ import { cn } from "@/lib/utils";
 interface InquireButtonProps {
   productId: string;
   productName: string;
+  /** Selected variant (e.g. "Color: Rosa"), carried into the opening message. */
+  variantLabel?: string;
   disabled?: boolean;
   className?: string;
   size?: "sm" | "default" | "lg";
@@ -29,6 +31,7 @@ interface InquireButtonProps {
 export function InquireButton({
   productId,
   productName,
+  variantLabel,
   disabled,
   className,
   size = "sm",
@@ -48,7 +51,11 @@ export function InquireButton({
       return;
     }
 
-    router.push(`/consultas/${result.conversationId}${result.isNew ? "?prefill=1" : ""}`);
+    const params = new URLSearchParams();
+    if (result.isNew) params.set("prefill", "1");
+    if (variantLabel) params.set("variant", variantLabel);
+    const query = params.toString();
+    router.push(`/consultas/${result.conversationId}${query ? `?${query}` : ""}`);
   };
 
   const handleClick = () => {

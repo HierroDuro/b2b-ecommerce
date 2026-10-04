@@ -53,7 +53,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   // `images`, when present, fully replaces the gallery (same contract as
   // the admin form's server action) — omit it from the body to leave the
   // existing gallery untouched on a partial update.
-  const { images, ...data } = parsed.data;
+  const { images, variants, ...data } = parsed.data;
 
   try {
     const updated = await prisma.product.update({
@@ -62,6 +62,13 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         ...data,
         ...(images !== undefined && {
           images: { deleteMany: {}, create: images.map((url, order) => ({ url, order })) },
+        }),
+        // Same contract as images: present = replace the whole list.
+        ...(variants !== undefined && {
+          variants: {
+            deleteMany: {},
+            create: variants.map((v, order) => ({ label: v.label, price: v.price, order })),
+          },
         }),
       },
     });
