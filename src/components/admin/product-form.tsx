@@ -238,7 +238,12 @@ export function ProductForm({ categories, product }: ProductFormProps) {
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <Label htmlFor="price">Precio</Label>
-          <Input id="price" type="number" step="0.01" {...register("price")} />
+          <div className="relative">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+              $
+            </span>
+            <Input id="price" type="number" step="0.01" className="pl-7" {...register("price")} />
+          </div>
           {errors.price && <p className="text-xs text-destructive">{errors.price.message}</p>}
         </div>
         <div className="space-y-1.5">
@@ -251,13 +256,19 @@ export function ProductForm({ categories, product }: ProductFormProps) {
       {isOnSale && (
         <div className="space-y-1.5">
           <Label htmlFor="originalPrice">Precio original</Label>
-          <Input
-            id="originalPrice"
-            type="number"
-            step="0.01"
-            placeholder="Precio de lista antes del descuento"
-            {...register("originalPrice")}
-          />
+          <div className="relative">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+              $
+            </span>
+            <Input
+              id="originalPrice"
+              type="number"
+              step="0.01"
+              className="pl-7"
+              placeholder="Precio de lista antes del descuento"
+              {...register("originalPrice")}
+            />
+          </div>
           <p className="text-xs text-muted-foreground">
             Opcional. Si lo cargás, el catálogo lo muestra tachado junto al precio actual. Dejalo
             vacío para mostrar solo la insignia &quot;Oferta&quot; sin precio tachado.
@@ -398,14 +409,20 @@ export function ProductForm({ categories, product }: ProductFormProps) {
               )}
             </div>
             <div className="w-40 space-y-1">
-              <Input
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="Precio (opcional)"
-                aria-label={`Precio de la variante ${index + 1}`}
-                {...register(`variants.${index}.price` as const)}
-              />
+              <div className="relative">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                  $
+                </span>
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  className="pl-7"
+                  placeholder="Opcional"
+                  aria-label={`Precio de la variante ${index + 1}`}
+                  {...register(`variants.${index}.price` as const)}
+                />
+              </div>
               {errors.variants?.[index]?.price && (
                 <p className="text-xs text-destructive">{errors.variants[index]?.price?.message}</p>
               )}

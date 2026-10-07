@@ -213,7 +213,7 @@ export function ProductTable({
                     <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md bg-muted/40">
                       <Image src={product.imageUrl} alt={product.name} fill className="object-contain p-1" />
                     </div>
-                    <span className="line-clamp-1 max-w-[220px] text-sm font-medium">
+                    <span className="min-w-[200px] max-w-[340px] break-words text-sm font-medium">
                       {product.name}
                     </span>
                   </div>
@@ -310,7 +310,7 @@ export function ProductTable({
                 <Image src={product.imageUrl} alt={product.name} fill className="object-contain p-1" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="line-clamp-1 text-sm font-medium text-foreground">{product.name}</p>
+                <p className="break-words text-sm font-medium text-foreground">{product.name}</p>
                 <EditableTextCell
                   value={product.sku}
                   ariaLabel={`SKU de ${product.name}`}
