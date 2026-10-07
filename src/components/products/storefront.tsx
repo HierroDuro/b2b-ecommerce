@@ -33,9 +33,14 @@ export function Storefront({
     !filters.featuredOnly &&
     filters.sort === "relevance";
 
+  // On desktop the filters normally live up in the hero (under the headline).
+  // While a search is active the hero is hidden, so the sidebar takes over
+  // next to the results instead of leaving them without filters.
+  const isSearching = filters.search.trim().length > 0;
+
   return (
     <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:gap-8">
-      <SidebarFilters categories={categories} brands={brands} />
+      {isSearching && <SidebarFilters categories={categories} brands={brands} />}
       <div className="flex-1">
         <div className="mb-4 lg:hidden">
           <MobileFiltersDialog categories={categories} brands={brands} />

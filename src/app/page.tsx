@@ -119,7 +119,7 @@ export default async function HomePage() {
         </div>
 
         <HideWhileSearching>
-          <Hero showcaseProducts={showcaseProducts} />
+          <Hero showcaseProducts={showcaseProducts} categories={categories} brands={brands} />
         </HideWhileSearching>
 
         <div id="catalogo" className="scroll-mt-[calc(var(--header-h)+16px)]">

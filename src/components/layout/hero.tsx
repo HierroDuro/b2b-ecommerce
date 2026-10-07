@@ -1,15 +1,20 @@
 "use client";
 
+import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Boxes, Tag, Truck, MessageCircle, type LucideIcon } from "lucide-react";
 
+import { FilterPanelContent } from "@/components/products/filter-panel-content";
+import { useProductFilters } from "@/components/products/product-filters-context";
 import { formatCurrency } from "@/lib/utils";
-import type { ProductDTO } from "@/types/product";
+import type { BrandOptionDTO, CategoryDTO, ProductDTO } from "@/types/product";
 
 interface HeroProps {
   showcaseProducts: ProductDTO[];
+  categories: CategoryDTO[];
+  brands: BrandOptionDTO[];
 }
 
 const valueProps: { icon: LucideIcon; label: string }[] = [
@@ -27,11 +32,23 @@ const valueProps: { icon: LucideIcon; label: string }[] = [
  * the pitch. Kept deliberately calm (no decorative blobs, one restrained
  * brand gradient) per the corporate-B2B direction.
  */
-export function Hero({ showcaseProducts }: HeroProps) {
+export function Hero({ showcaseProducts, categories, brands }: HeroProps) {
   const showcase = showcaseProducts.slice(0, 9);
 
+  // The desktop filters live up here now (under the headline), far above the
+  // results grid — so when a filter gets turned on, jump down to the catalog
+  // instead of leaving the person looking at an unchanged hero.
+  const { activeFilterCount } = useProductFilters();
+  const previousCount = React.useRef(activeFilterCount);
+  React.useEffect(() => {
+    if (activeFilterCount > previousCount.current && window.matchMedia("(min-width: 1024px)").matches) {
+      document.getElementById("catalogo")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    previousCount.current = activeFilterCount;
+  }, [activeFilterCount]);
+
   return (
-    <section className="grid gap-6 py-5 sm:py-8 lg:grid-cols-[1fr_1.35fr] lg:items-center lg:gap-16 lg:py-14">
+    <section className="grid gap-6 py-5 sm:py-8 lg:grid-cols-[1fr_1.35fr] lg:items-start lg:gap-16 lg:pb-14 lg:pt-4">
       <motion.div
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
@@ -65,6 +82,16 @@ export function Hero({ showcaseProducts }: HeroProps) {
             </div>
           ))}
         </dl>
+
+        {/* Desktop filters, right under the headline block. Capped height with
+            its own scroll so a long category/brand list never pushes the page
+            taller than the showcase panel next to it. Phones/tablets keep the
+            "Filtros" dialog above the results instead. */}
+        <div className="mt-8 hidden lg:block">
+          <div className="max-h-[520px] overflow-y-auto rounded-xl border border-border bg-card p-6 shadow-soft">
+            <FilterPanelContent categories={categories} brands={brands} />
+          </div>
+        </div>
 
         {/* Phone/tablet get the same "9 cheapest, real and clickable" proof
             as the desktop panel, just as a plain 3x3 grid (3 columns wrap
