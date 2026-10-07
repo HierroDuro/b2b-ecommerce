@@ -28,11 +28,13 @@ import type { CategoryDTO, ProductDTO } from "@/types/product";
 interface ProductFormProps {
   categories: CategoryDTO[];
   product?: ProductDTO;
+  /** Brands already in use, offered as suggestions in the "Marca" field. */
+  brands?: string[];
 }
 
 const MAX_GALLERY_IMAGES = 8;
 
-export function ProductForm({ categories, product }: ProductFormProps) {
+export function ProductForm({ categories, product, brands = [] }: ProductFormProps) {
   const router = useRouter();
   const [uploadingCover, setUploadingCover] = React.useState(false);
   const [uploadingGallery, setUploadingGallery] = React.useState(false);
@@ -191,7 +193,16 @@ export function ProductForm({ categories, product }: ProductFormProps) {
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="brand">Marca</Label>
-          <Input id="brand" {...register("brand")} />
+          <Input id="brand" list="brand-suggestions" autoComplete="off" {...register("brand")} />
+          <datalist id="brand-suggestions">
+            {brands.map((b) => (
+              <option key={b} value={b} />
+            ))}
+          </datalist>
+          <p className="text-xs text-muted-foreground">
+            Elegí una marca de la lista para no duplicarla. Si ya existe, se guarda con su
+            escritura original aunque cambien las mayúsculas.
+          </p>
           {errors.brand && <p className="text-xs text-destructive">{errors.brand.message}</p>}
         </div>
       </div>

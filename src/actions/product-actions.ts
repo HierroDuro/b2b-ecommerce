@@ -5,6 +5,7 @@ import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { requireAdminSession } from "@/lib/require-admin";
+import { resolveBrand } from "@/lib/brands";
 import { productSchema, type ProductInput } from "@/lib/validations/product.schema";
 
 /**
@@ -42,6 +43,7 @@ export async function createProduct(input: ProductInput): Promise<ActionResult> 
   }
 
   const { images, variants, ...data } = parsed.data;
+  data.brand = await resolveBrand(data.brand);
 
   try {
     await prisma.product.create({
@@ -76,6 +78,7 @@ export async function updateProduct(id: string, input: ProductInput): Promise<Ac
   }
 
   const { images, variants, ...data } = parsed.data;
+  data.brand = await resolveBrand(data.brand, id);
 
   // Variant photos aren't editable in the admin form, so a save would
   // wipe them with the delete+recreate below; carry each existing one over

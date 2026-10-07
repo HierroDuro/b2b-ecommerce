@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { requireAdminSession } from "@/lib/require-admin";
+import { resolveBrand } from "@/lib/brands";
 import { productObjectSchema } from "@/lib/validations/product.schema";
 
 interface RouteParams {
@@ -54,6 +55,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   // the admin form's server action) — omit it from the body to leave the
   // existing gallery untouched on a partial update.
   const { images, variants, ...data } = parsed.data;
+  if (data.brand !== undefined) data.brand = await resolveBrand(data.brand, id);
 
   try {
     const updated = await prisma.product.update({

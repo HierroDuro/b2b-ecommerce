@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { ProductForm } from "@/components/admin/product-form";
 import { prisma } from "@/lib/prisma";
+import { getExistingBrands } from "@/lib/brands";
 import { toVariantDTOs } from "@/lib/variants";
 
 export const metadata: Metadata = {
@@ -17,7 +18,7 @@ export default async function EditProductPage({
 }) {
   const { id } = await params;
 
-  const [product, categories] = await Promise.all([
+  const [product, categories, brands] = await Promise.all([
     prisma.product.findUnique({
       where: { id },
       include: {
@@ -27,6 +28,7 @@ export default async function EditProductPage({
       },
     }),
     prisma.category.findMany({ orderBy: { name: "asc" } }),
+    getExistingBrands(),
   ]);
 
   if (!product) notFound();
@@ -47,7 +49,7 @@ export default async function EditProductPage({
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">Editar producto</h1>
         <p className="text-sm text-muted-foreground">{product.name}</p>
       </div>
-      <ProductForm categories={categories} product={productDTO} />
+      <ProductForm categories={categories} product={productDTO} brands={brands.map((b) => b.name)} />
     </div>
   );
 }
