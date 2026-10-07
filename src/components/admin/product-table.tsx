@@ -32,6 +32,7 @@ import {
   getProductConversationCount,
   toggleProductFlag,
   updateProductCategory,
+  updateProductName,
   updateProductPrice,
   updateProductSku,
   updateProductStock,
@@ -61,7 +62,13 @@ export function ProductTable({
   const [overrides, setOverrides] = React.useState<
     Record<
       string,
-      { price?: number; stock?: number; sku?: string; category?: { id: string; name: string; slug: string } }
+      {
+        price?: number;
+        stock?: number;
+        sku?: string;
+        name?: string;
+        category?: { id: string; name: string; slug: string };
+      }
     >
   >({});
 
@@ -89,6 +96,11 @@ export function ProductTable({
 
   const saveStock = (id: string, stock: number) => {
     setOverrides((prev) => ({ ...prev, [id]: { ...prev[id], stock } }));
+    router.refresh();
+  };
+
+  const saveName = (id: string, name: string) => {
+    setOverrides((prev) => ({ ...prev, [id]: { ...prev[id], name } }));
     router.refresh();
   };
 
@@ -213,9 +225,14 @@ export function ProductTable({
                     <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md bg-muted/40">
                       <Image src={product.imageUrl} alt={product.name} fill className="object-contain p-1" />
                     </div>
-                    <span className="min-w-[200px] max-w-[340px] break-words text-sm font-medium">
-                      {product.name}
-                    </span>
+                    <EditableTextCell
+                      value={product.name}
+                      ariaLabel={`nombre de ${product.name}`}
+                      className="min-w-[200px] max-w-[340px] break-words text-sm font-medium"
+                      inputClassName="min-w-[16rem]"
+                      onSave={(name) => updateProductName(product.id, name)}
+                      onSaved={(name) => saveName(product.id, name)}
+                    />
                   </div>
                 </TableCell>
                 <TableCell className="text-xs text-muted-foreground">
@@ -310,7 +327,13 @@ export function ProductTable({
                 <Image src={product.imageUrl} alt={product.name} fill className="object-contain p-1" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="break-words text-sm font-medium text-foreground">{product.name}</p>
+                <EditableTextCell
+                  value={product.name}
+                  ariaLabel={`nombre de ${product.name}`}
+                  className="break-words text-sm font-medium text-foreground"
+                  onSave={(name) => updateProductName(product.id, name)}
+                  onSaved={(name) => saveName(product.id, name)}
+                />
                 <EditableTextCell
                   value={product.sku}
                   ariaLabel={`SKU de ${product.name}`}

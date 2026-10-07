@@ -224,6 +224,34 @@ export async function updateProductPrice(id: string, price: number): Promise<Act
   return { success: true, message: "Precio actualizado." };
 }
 
+/** Quick name edit from the admin table's inline cell. Same bounds as the
+ * full form (see product.schema.ts) so both paths accept the same names. */
+export async function updateProductName(id: string, name: string): Promise<ActionResult> {
+  await ensureAdmin();
+
+  const trimmed = name.trim();
+  if (trimmed.length < 3) {
+    return { success: false, message: "El nombre debe tener al menos 3 caracteres." };
+  }
+  if (trimmed.length > 160) {
+    return { success: false, message: "El nombre es demasiado largo (máximo 160 caracteres)." };
+  }
+
+  try {
+    await prisma.product.update({ where: { id }, data: { name: trimmed } });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
+      return { success: false, message: "El producto ya no existe." };
+    }
+    throw error;
+  }
+
+  revalidatePath("/");
+  revalidatePath(`/productos/${id}`);
+  revalidatePath("/admin/products");
+  return { success: true, message: "Nombre actualizado." };
+}
+
 /** Quick SKU edit from the admin table's inline cell. SKU is free-form
  * (see product.schema.ts) but still unique, so this still has to handle
  * the same P2002 collision as the full edit form. */
