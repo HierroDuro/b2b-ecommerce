@@ -3,7 +3,7 @@
 import { OffersMarquee } from "@/components/layout/offers-marquee";
 import { Storefront } from "@/components/products/storefront";
 import { useProductFilters } from "@/components/products/product-filters-context";
-import type { CategoryDTO, ProductDTO } from "@/types/product";
+import type { BrandOptionDTO, CategoryDTO, ProductDTO } from "@/types/product";
 
 /**
  * Arranges "Ofertas de la semana" and the product grid/filters — the
@@ -18,9 +18,11 @@ import type { CategoryDTO, ProductDTO } from "@/types/product";
  */
 export function CatalogSection({
   categories,
+  brands,
   offers,
 }: {
   categories: CategoryDTO[];
+  brands: BrandOptionDTO[];
   offers: ProductDTO[];
 }) {
   const { filters } = useProductFilters();
@@ -29,7 +31,7 @@ export function CatalogSection({
   if (isSearching) {
     return (
       <>
-        <Storefront categories={categories} />
+        <Storefront categories={categories} brands={brands} />
         <div className="mt-14">
           <OffersMarquee offers={offers} />
         </div>
@@ -40,7 +42,7 @@ export function CatalogSection({
   return (
     <>
       <OffersMarquee offers={offers} />
-      <Storefront categories={categories} />
+      <Storefront categories={categories} brands={brands} />
     </>
   );
 }

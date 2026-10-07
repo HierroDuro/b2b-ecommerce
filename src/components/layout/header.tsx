@@ -2,9 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ChevronDown } from "lucide-react";
 
-import { siteConfig } from "@/config/site";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { SearchBar } from "@/components/products/search-bar";
 import { AccountBar, AccountMenu } from "@/components/layout/account-menu";
@@ -29,24 +27,9 @@ export function Header() {
       style={{ height: "var(--header-h)" }}
     >
       <div className="relative mx-auto grid h-full max-w-[1920px] grid-cols-[1fr_auto_1fr] items-center gap-2 px-2 md:gap-4 md:px-6 lg:px-10">
-        {/* Left zone: primary navigation. Only from lg up — below that the
-            big centered logo leaves no room for it; the same links live in
-            the footer. The wrapper div stays in the grid so the logo keeps
-            its centered column either way. */}
-        <div>
-          <nav className="hidden items-center gap-7 lg:flex">
-            {siteConfig.nav.map((item, index) => (
-              <Link
-                key={item.href + item.label}
-                href={item.href}
-                className="flex items-center gap-1 text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
-              >
-                {item.label}
-                {index === 0 && <ChevronDown className="h-3.5 w-3.5 opacity-60" />}
-              </Link>
-            ))}
-          </nav>
-        </div>
+        {/* Left zone: intentionally empty (the "Productos" link was removed),
+            but kept in the grid so the logo stays in its centered column. */}
+        <div />
 
         {/* Center zone: logo */}
         <Link href="/" aria-label="Inicio" className="justify-self-center">

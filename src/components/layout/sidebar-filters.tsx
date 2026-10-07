@@ -3,14 +3,20 @@
 import { motion } from "framer-motion";
 
 import { FilterPanelContent } from "@/components/products/filter-panel-content";
-import type { CategoryDTO } from "@/types/product";
+import type { BrandOptionDTO, CategoryDTO } from "@/types/product";
 
 /**
  * Desktop-only sticky sidebar (stays pinned under the header while the
  * product grid scrolls). Hidden below `lg`; small screens get the same
  * filters via `MobileFiltersDialog` instead.
  */
-export function SidebarFilters({ categories }: { categories: CategoryDTO[] }) {
+export function SidebarFilters({
+  categories,
+  brands,
+}: {
+  categories: CategoryDTO[];
+  brands: BrandOptionDTO[];
+}) {
   return (
     <motion.aside
       initial={{ opacity: 0, x: -12 }}
@@ -30,7 +36,7 @@ export function SidebarFilters({ categories }: { categories: CategoryDTO[] }) {
         className="overflow-y-auto rounded-xl border border-border bg-card p-6 shadow-soft"
         style={{ maxHeight: "calc(100vh - var(--header-h) - 48px)" }}
       >
-        <FilterPanelContent categories={categories} />
+        <FilterPanelContent categories={categories} brands={brands} />
       </div>
     </motion.aside>
   );

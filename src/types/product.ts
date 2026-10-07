@@ -28,6 +28,12 @@ export interface CategoryDTO extends Category {
   productCount?: number;
 }
 
+/** A brand shown in the storefront filters, with how many active products carry it. */
+export interface BrandOptionDTO {
+  name: string;
+  count: number;
+}
+
 export interface ProductListResponse {
   products: ProductDTO[];
   total: number;

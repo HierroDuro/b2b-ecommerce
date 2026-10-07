@@ -13,10 +13,16 @@ import {
 } from "@/components/ui/dialog";
 import { FilterPanelContent } from "@/components/products/filter-panel-content";
 import { useProductFilters } from "@/components/products/product-filters-context";
-import type { CategoryDTO } from "@/types/product";
+import type { BrandOptionDTO, CategoryDTO } from "@/types/product";
 
 /** Filters entry point for < lg screens, where the sticky sidebar is hidden. */
-export function MobileFiltersDialog({ categories }: { categories: CategoryDTO[] }) {
+export function MobileFiltersDialog({
+  categories,
+  brands,
+}: {
+  categories: CategoryDTO[];
+  brands: BrandOptionDTO[];
+}) {
   const [open, setOpen] = React.useState(false);
   const { activeFilterCount } = useProductFilters();
 
@@ -37,7 +43,7 @@ export function MobileFiltersDialog({ categories }: { categories: CategoryDTO[] 
         <DialogHeader>
           <DialogTitle className="sr-only">Filtros</DialogTitle>
         </DialogHeader>
-        <FilterPanelContent categories={categories} />
+        <FilterPanelContent categories={categories} brands={brands} />
       </DialogContent>
     </Dialog>
   );

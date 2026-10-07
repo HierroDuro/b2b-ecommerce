@@ -6,7 +6,7 @@ import { HideWhileSearching } from "@/components/layout/hide-while-searching";
 import { SearchBar } from "@/components/products/search-bar";
 import { prisma } from "@/lib/prisma";
 import { toVariantDTOs } from "@/lib/variants";
-import type { CategoryDTO, ProductDTO } from "@/types/product";
+import type { BrandOptionDTO, CategoryDTO, ProductDTO } from "@/types/product";
 
 // Product data changes often (stock, prices), so this page revalidates
 // frequently rather than being fully static — a good default for a
@@ -26,6 +26,23 @@ async function getCategories(): Promise<CategoryDTO[]> {
     updatedAt: c.updatedAt,
     productCount: c._count.products,
   }));
+}
+
+/** Brands for the "Marcas" filter: only brands of active products, A-Z, with
+ * the generic "Genérico" bucket always last so real brands read first. */
+async function getBrands(): Promise<BrandOptionDTO[]> {
+  const rows = await prisma.product.groupBy({
+    by: ["brand"],
+    where: { isActive: true },
+    _count: { _all: true },
+  });
+  const isGeneric = (name: string) => name.trim().toLowerCase() === "genérico" || name.trim().toLowerCase() === "generico";
+  return rows
+    .map((r) => ({ name: r.brand, count: r._count._all }))
+    .sort((a, b) => {
+      if (isGeneric(a.name) !== isGeneric(b.name)) return isGeneric(a.name) ? 1 : -1;
+      return a.name.localeCompare(b.name, "es", { sensitivity: "base" });
+    });
 }
 
 /** Feeds the hero banner's auto-scrolling strip. `showInBanner` is a
@@ -81,8 +98,9 @@ async function getShowcaseProducts(): Promise<ProductDTO[]> {
 }
 
 export default async function HomePage() {
-  const [categories, onSaleProducts, showcaseProducts] = await Promise.all([
+  const [categories, brands, onSaleProducts, showcaseProducts] = await Promise.all([
     getCategories(),
+    getBrands(),
     getOnSaleProducts(),
     getShowcaseProducts(),
   ]);
@@ -105,7 +123,7 @@ export default async function HomePage() {
         </HideWhileSearching>
 
         <div id="catalogo" className="scroll-mt-[calc(var(--header-h)+16px)]">
-          <CatalogSection categories={categories} offers={onSaleProducts} />
+          <CatalogSection categories={categories} brands={brands} offers={onSaleProducts} />
         </div>
       </main>
       <Footer />

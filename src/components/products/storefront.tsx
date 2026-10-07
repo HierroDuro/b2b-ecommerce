@@ -5,7 +5,7 @@ import { MobileFiltersDialog } from "@/components/layout/mobile-filters-dialog";
 import { ProductGrid } from "@/components/products/product-grid";
 import { CuratedProductFeed } from "@/components/products/curated-product-feed";
 import { useProductFilters } from "@/components/products/product-filters-context";
-import type { CategoryDTO } from "@/types/product";
+import type { BrandOptionDTO, CategoryDTO } from "@/types/product";
 
 /**
  * Note: this does NOT wrap itself in a `ProductFiltersProvider` — the
@@ -13,7 +13,13 @@ import type { CategoryDTO } from "@/types/product";
  * (rendered as a sibling, outside this component) shares the exact same
  * filter state as the sidebar and grid below. See src/app/layout.tsx.
  */
-export function Storefront({ categories }: { categories: CategoryDTO[] }) {
+export function Storefront({
+  categories,
+  brands,
+}: {
+  categories: CategoryDTO[];
+  brands: BrandOptionDTO[];
+}) {
   const { filters } = useProductFilters();
 
   // No search/filters active: show the curated, sectioned-by-category
@@ -29,10 +35,10 @@ export function Storefront({ categories }: { categories: CategoryDTO[] }) {
 
   return (
     <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:gap-8">
-      <SidebarFilters categories={categories} />
+      <SidebarFilters categories={categories} brands={brands} />
       <div className="flex-1">
         <div className="mb-4 lg:hidden">
-          <MobileFiltersDialog categories={categories} />
+          <MobileFiltersDialog categories={categories} brands={brands} />
         </div>
         {isDefaultView ? <CuratedProductFeed /> : <ProductGrid />}
       </div>
