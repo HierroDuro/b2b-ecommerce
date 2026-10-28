@@ -2,9 +2,11 @@ import type { MetadataRoute } from "next";
 
 import { prisma } from "@/lib/prisma";
 import { siteConfig } from "@/config/site";
+import { brandSlug } from "@/lib/brand-slug";
+import { getStorefrontBrands } from "@/lib/catalog-brands";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [categories, products] = await Promise.all([
+  const [categories, products, brands] = await Promise.all([
     prisma.category.findMany({ select: { slug: true, updatedAt: true } }),
     // Same visibility rule as the public catalog: only an inactive product
     // has no indexable page — out-of-stock ones still get one ("No
@@ -13,6 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       where: { isActive: true },
       select: { id: true, updatedAt: true },
     }),
+    getStorefrontBrands(),
   ]);
 
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -34,5 +37,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticRoutes, ...categoryRoutes, ...productRoutes];
+  const brandRoutes: MetadataRoute.Sitemap = [...new Set(brands.map((b) => brandSlug(b.name)).filter(Boolean))].map((slug) => ({
+    url: `${siteConfig.url}/marcas/${slug}`,
+    changeFrequency: "daily",
+    priority: 0.7,
+  }));
+
+  return [...staticRoutes, ...categoryRoutes, ...brandRoutes, ...productRoutes];
 }
