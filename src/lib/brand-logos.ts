@@ -26,4 +26,5 @@ export const brandLogos: Record<string, { w: number; h: number }> = {
   cld: { w: 287, h: 160 },
   gtc: { w: 332, h: 160 },
   goldery: { w: 649, h: 160 },
+  trendy: { w: 830, h: 160 },
 };
