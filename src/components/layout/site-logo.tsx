@@ -19,8 +19,8 @@ export function SiteLogo({ className, priority }: SiteLogoProps) {
       <Image
         src="/logo.png"
         alt="Logo"
-        width={640}
-        height={222}
+        width={900}
+        height={301}
         priority={priority}
         // Served as-is: the optimizer's lossy re-encode turned the thin
         // white stripes inside the letters into mush at this small size.
