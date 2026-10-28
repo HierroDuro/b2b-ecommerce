@@ -1,17 +1,21 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import Link from "next/link";
 
 import { AutoScroller } from "@/components/layout/auto-scroller";
 import { brandSlug } from "@/lib/brand-slug";
+import { brandLogos } from "@/lib/brand-logos";
 import { cn } from "@/lib/utils";
 import type { BrandOptionDTO } from "@/types/product";
 
 /** Thin auto-scrolling strip with every brand in the catalog. It scrolls
  * exactly like the offers strip (idle drift, edge run, hover hold, touch),
  * and each brand is a link to /marcas/<brand>, the page with all of that
- * brand's products. `activeSlug` highlights the brand whose page is open. */
+ * brand's products. Brands show their transparent PNG logo (see
+ * lib/brand-logos.ts) and fall back to the name when there is none.
+ * `activeSlug` highlights the brand whose page is open. */
 export function BrandsBar({
   brands,
   activeSlug,
@@ -40,28 +44,42 @@ export function BrandsBar({
       <AutoScroller
         items={merged}
         getKey={(brand) => brand.name}
-        trackClassName="items-center gap-2 py-1 sm:gap-2.5"
+        trackClassName="items-center gap-2 py-1.5 sm:gap-3"
         cueClassName="h-6 w-6"
         minLoopItems={10}
         renderItem={(brand) => {
           const slug = brandSlug(brand.name);
           const active = slug === activeSlug;
+          const logo = brandLogos[slug];
           return (
             <Link
               href={`/marcas/${slug}`}
               draggable={false}
+              aria-label={brand.name}
+              title={brand.name}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-3.5 text-xs font-semibold transition-colors sm:h-9 sm:px-4 sm:text-sm",
-                active
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-card text-foreground hover:border-primary/40 hover:bg-secondary",
+                // Always a white chip (like the site logo): dark logos (HP,
+                // Epson...) would vanish on the dark theme otherwise.
+                "inline-flex h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-full border bg-white px-4 shadow-soft transition-all hover:-translate-y-px hover:border-primary/50 sm:h-12 sm:px-5",
+                active ? "border-primary ring-2 ring-primary" : "border-border",
               )}
             >
-              {brand.name}
-              <span className={cn("text-[10px] font-medium sm:text-xs", active ? "opacity-80" : "text-muted-foreground")}>
-                {brand.count}
-              </span>
+              {logo ? (
+                <Image
+                  src={`/brands/${slug}.png`}
+                  alt={brand.name}
+                  width={logo.w}
+                  height={logo.h}
+                  unoptimized
+                  draggable={false}
+                  className="h-5 w-auto select-none sm:h-6"
+                />
+              ) : (
+                <span className="text-xs font-bold uppercase tracking-wide text-slate-700 sm:text-sm">
+                  {brand.name}
+                </span>
+              )}
             </Link>
           );
         }}
