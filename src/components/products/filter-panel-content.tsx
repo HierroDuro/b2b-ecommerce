@@ -1,10 +1,14 @@
 "use client";
 
+import Image from "next/image";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { useProductFilters } from "@/components/products/product-filters-context";
+import { brandLogos } from "@/lib/brand-logos";
+import { brandSlug } from "@/lib/brand-slug";
 import type { BrandOptionDTO, CategoryDTO } from "@/types/product";
 
 /**
@@ -59,6 +63,8 @@ export function FilterPanelContent({
             <div className="space-y-3.5">
               {brands.map((brand) => {
                 const id = `brand-${brand.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+                const slug = brandSlug(brand.name);
+                const logo = brandLogos[slug];
                 return (
                   <div key={brand.name} className="flex items-center gap-2.5">
                     <Checkbox
@@ -70,7 +76,22 @@ export function FilterPanelContent({
                       htmlFor={id}
                       className="flex flex-1 cursor-pointer items-center justify-between gap-2 text-sm font-normal text-foreground/80"
                     >
-                      <span className="min-w-0 break-words">{brand.name}</span>
+                      {logo ? (
+                        // White chip, like the brands strip: dark logos would
+                        // vanish on the dark theme otherwise.
+                        <span className="flex h-8 min-w-0 items-center rounded-md border border-border bg-white px-2.5 shadow-soft">
+                          <Image
+                            src={`/brands/${slug}.png`}
+                            alt={brand.name}
+                            width={logo.w}
+                            height={logo.h}
+                            unoptimized
+                            className="h-4 w-auto max-w-[8rem] select-none object-contain"
+                          />
+                        </span>
+                      ) : (
+                        <span className="min-w-0 break-words">{brand.name}</span>
+                      )}
                       <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
                         {brand.count}
                       </span>
