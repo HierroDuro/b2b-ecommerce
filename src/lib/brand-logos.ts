@@ -20,4 +20,10 @@ export const brandLogos: Record<string, { w: number; h: number }> = {
   seagate: { w: 658, h: 160 },
   hyperx: { w: 555, h: 160 },
   kelyx: { w: 738, h: 160 },
+  biwo: { w: 406, h: 160 },
+  stg: { w: 248, h: 160 },
+  "alpine-skate": { w: 274, h: 160 },
+  cld: { w: 287, h: 160 },
+  gtc: { w: 332, h: 160 },
+  goldery: { w: 649, h: 160 },
 };
