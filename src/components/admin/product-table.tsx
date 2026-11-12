@@ -41,7 +41,7 @@ import { EditableNumberCell } from "@/components/admin/editable-number-cell";
 import { EditableTextCell } from "@/components/admin/editable-text-cell";
 import { EditableCategoryCell } from "@/components/admin/editable-category-cell";
 import { formatCurrency } from "@/lib/utils";
-import { fuzzyScore, productSearchText } from "@/lib/fuzzy-search";
+import { productSearchScore } from "@/lib/fuzzy-search";
 import type { ProductDTO } from "@/types/product";
 
 export function ProductTable({
@@ -83,7 +83,7 @@ export function ProductTable({
   const visibleProducts = React.useMemo(() => {
     if (!search.trim()) return productsWithOverrides;
     return productsWithOverrides
-      .map((p) => ({ product: p, score: fuzzyScore(search, productSearchText(p)) }))
+      .map((p) => ({ product: p, score: productSearchScore(search, p) }))
       .filter((s) => s.score > 0)
       .sort((a, b) => b.score - a.score)
       .map((s) => s.product);

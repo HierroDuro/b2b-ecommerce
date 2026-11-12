@@ -136,7 +136,11 @@ export function fuzzyScore(query: string, text: string): number {
   const textWords = tokenize(text);
   if (allQueryWords.length === 0 || textWords.length === 0) return 0;
 
-  const significantWords = allQueryWords.filter((w) => w.length >= 3);
+  // A code word ("12", "5s", "a7") is significant whatever its length: it is
+  // usually the model number, the one word that tells two products of the same
+  // line apart ("NG-BTWINS 12" vs "NG-BTWINS 5S"), and it only ever matches
+  // exactly (see wordSimilarity), so it can't cause the short-word false positives.
+  const significantWords = allQueryWords.filter((w) => w.length >= 3 || isCode(w));
   const queryWords = significantWords.length > 0 ? significantWords : allQueryWords;
 
   let total = 0;
@@ -167,4 +171,19 @@ export function productSearchText(p: {
   // Variant labels ("Rosa", "128 GB") are searchable too.
   const variantText = (p.variants ?? []).map((v) => v.label).join(" ");
   return `${p.name} ${p.brand} ${p.sku} ${p.description} ${p.category.name} ${variantText}`;
+}
+
+/** Ranking score for a product: the full-text score averaged with the score
+ * against just name/brand/SKU, so a match in the title outranks one that only
+ * shows up somewhere in the description ("12 metros" in another model's specs
+ * must not rank next to the model actually called "... 12"). Still 0 when the
+ * product doesn't match at all. */
+export function productSearchScore(
+  query: string,
+  p: Parameters<typeof productSearchText>[0],
+): number {
+  const full = fuzzyScore(query, productSearchText(p));
+  if (full === 0) return 0;
+  const head = fuzzyScore(query, `${p.name} ${p.brand} ${p.sku}`);
+  return (full + head) / 2;
 }

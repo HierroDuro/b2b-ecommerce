@@ -4,7 +4,7 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { toVariantDTOs } from "@/lib/variants";
 import { productQuerySchema } from "@/lib/validations/product.schema";
-import { fuzzyScore, productSearchText } from "@/lib/fuzzy-search";
+import { productSearchScore } from "@/lib/fuzzy-search";
 import { sortAvailableFirst } from "@/lib/utils";
 import type { ProductDTO, ProductListResponse } from "@/types/product";
 
@@ -140,7 +140,7 @@ export async function GET(request: NextRequest) {
 
   if (query.search) {
     const scored = dtos
-      .map((dto) => ({ dto, score: fuzzyScore(query.search, productSearchText(dto)) }))
+      .map((dto) => ({ dto, score: productSearchScore(query.search, dto) }))
       .filter((s) => s.score > 0);
     // "Relevance" while searching means fuzzy-match quality — leave that
     // order alone. Any other explicit sort (price, newest) still applies
