@@ -58,12 +58,10 @@ export function Hero({ showcaseProducts, categories, brands }: HeroProps) {
           Librería e imprenta · Microcentro, CABA
         </span>
 
-        <h1 className="mt-4 text-3xl font-bold leading-[1.15] tracking-tight text-foreground sm:mt-5 sm:text-4xl sm:leading-[1.12] lg:text-5xl">
-          Todo lo que tu empresa necesita,{" "}
-          <span className="text-gradient-aurora">en un solo proveedor</span>.
-        </h1>
+        {/* Headline hidden on purpose, but kept for screen readers and SEO. */}
+        <h1 className="sr-only">Todo lo que tu empresa necesita, en un solo proveedor.</h1>
 
-        <div className="mt-5 flex flex-wrap items-center gap-3 sm:mt-8">
+        <div className="mt-4 flex flex-wrap items-center gap-3 sm:mt-6">
           <Link
             href="#catalogo"
             className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-soft transition-transform hover:scale-[1.03]"
@@ -88,8 +86,8 @@ export function Hero({ showcaseProducts, categories, brands }: HeroProps) {
             taller than the showcase panel next to it. Phones/tablets keep the
             "Filtros" dialog above the results instead. */}
         <div className="mt-8 hidden lg:block">
-          <div className="max-h-[520px] overflow-y-auto rounded-xl border border-border bg-card p-6 shadow-soft">
-            <FilterPanelContent categories={categories} brands={brands} />
+          <div className="rounded-xl border border-border bg-card p-5 shadow-soft">
+            <FilterPanelContent categories={categories} brands={brands} showTitle={false} compact />
           </div>
         </div>
 

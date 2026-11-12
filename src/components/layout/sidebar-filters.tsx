@@ -36,7 +36,7 @@ export function SidebarFilters({
         className="overflow-y-auto rounded-xl border border-border bg-card p-6 shadow-soft"
         style={{ maxHeight: "calc(100vh - var(--header-h) - 48px)" }}
       >
-        <FilterPanelContent categories={categories} brands={brands} />
+        <FilterPanelContent categories={categories} brands={brands} showTitle={false} />
       </div>
     </motion.aside>
   );
