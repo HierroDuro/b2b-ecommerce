@@ -23,7 +23,7 @@ export const brandLogos: Record<string, { w: number; h: number }> = {
   biwo: { w: 406, h: 160 },
   stg: { w: 248, h: 160 },
   "alpine-skate": { w: 274, h: 160 },
-  cld: { w: 287, h: 160 },
+  cld: { w: 481, h: 160 },
   gtc: { w: 332, h: 160 },
   goldery: { w: 649, h: 160 },
   trendy: { w: 830, h: 160 },
